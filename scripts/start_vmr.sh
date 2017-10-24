@@ -28,7 +28,6 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 # Initialize our own variables:
 solace_password=""
 solace_image=""
-zone="us-central1-b"
 verbose=0
 
 while getopts "i:p:z:" opt; do
@@ -37,8 +36,6 @@ while getopts "i:p:z:" opt; do
         ;;
     p)  solace_password=$OPTARG
         ;;
-    z)  zone=$OPTARG
-        ;;
     esac
 done
 
@@ -46,7 +43,7 @@ shift $((OPTIND-1))
 [ "$1" = "--" ] && shift
 
 verbose=1
-echo "`date` INFO: solace_image=$solace_image, zone=$zone ,Leftovers: $@"
+echo "`date` INFO: solace_image=$solace_image ,Leftovers: $@"
 
 
 echo "`date` INFO: DOWNLOAD KOMPOSE"
@@ -93,15 +90,6 @@ volumes:
       device: tmpfs
 EOL
 
-echo "`date` INFO: INITIALIZE GCLOUD"
-echo "#############################################################"
-gcloud components install kubectl
-gcloud config set compute/zone ${zone}
-
-echo "`date` INFO: CREATE CLUSTER"
-echo "#############################################################"
-gcloud container clusters create solace-vmr-cluster --machine-type=n1-standard-2 --num-nodes=1
-gcloud container clusters get-credentials solace-vmr-cluster
 
 echo "`date` INFO: DEPLOY VMR TO CLUSTER"
 echo "#############################################################"

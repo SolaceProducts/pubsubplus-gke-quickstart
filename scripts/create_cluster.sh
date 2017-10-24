@@ -26,16 +26,19 @@
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
-solace_password=""
-solace_image=""
+cluster_name="solace-vmr-cluster"
+machine_type="n1-standard-2"
+number_of_nodes="1"
 zone="us-central1-b"
 verbose=0
 
-while getopts "i:p:z:" opt; do
+while getopts "c:m:n:z:" opt; do
     case "$opt" in
-    i)  solace_image=$OPTARG
+    c)  cluster_name=$OPTARG
         ;;
-    p)  solace_password=$OPTARG
+    m)  machine_type=$OPTARG
+        ;;
+    n)  number_of_nodes=$OPTARG
         ;;
     z)  zone=$OPTARG
         ;;
@@ -46,4 +49,14 @@ shift $((OPTIND-1))
 [ "$1" = "--" ] && shift
 
 verbose=1
-echo "`date` INFO: solace_image=$solace_image, zone=$zone ,Leftovers: $@"
+echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, number_of_nodes=${number_of_nodes} zone=${zone} ,Leftovers: $@"
+
+echo "`date` INFO: INITIALIZE GCLOUD"
+echo "#############################################################"
+gcloud components install kubectl
+gcloud config set compute/zone ${zone}
+
+echo "`date` INFO: CREATE CLUSTER"
+echo "#############################################################"
+gcloud container clusters create ${cluster_name} --machine-type=${machine_type} --num-nodes=${number_of_nodes}
+gcloud container clusters get-credentials ${cluster_name}
