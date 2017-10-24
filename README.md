@@ -1,6 +1,12 @@
 # Install a Solace Message Router onto a Google Container Engine, (gke), cluster
 
-The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capabilities deployable in any computing environment. The VMR provides the same rich feature set as Solace’s proven hardware appliances, with the same open protocol support, APIs and common management. The VMR can be deployed in the datacenter or natively within all popular private and public clouds. 
+## Purpose of this repository
+
+This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to provide a concrete example of how to deploy a Solace VMR on Google Container Engine on a single node GKE cluster.
+
+## Description of Solace VMR
+
+The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capabilities deployable in any computing environment. The VMR provides the same rich feature set as Solace’s proven hardware appliances, with the same open protocol support, APIs and common management. The VMR can be deployed in the datacenter or natively within all popular private and public clouds.
 
 ## How to Deploy a VMR onto GKE
 
@@ -24,32 +30,32 @@ This is a 4 step process:
 2. Go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink.  This link is of the form "http<nolink>://em.solace.com ?" will be needed in the following section.
 
 <a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
-    <img src="https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/register.png"/>
+    <img src="https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/68545/images/register.png"/>
 </a>
 
 3. Place Solace VMR in Google Container Registry:
 * Open a cloud shell. From the google cloud console used to create the project open a shell:
 
-![alt text](https://raw.githubusercontent.com/KenBarr/solace-gke-quickstart/master/images/launch_google_cloud_shell.png "Google Cloud Shell")
+![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/launch_google_cloud_shell.png "Google Cloud Shell")
 
 * In the cloud shell paste the following, (replace http<nolink>://em.solace.com/??? with the link recieved in email from step 2.)
 
 ```Shell
-wget https://raw.githubusercontent.com/KenBarr/solace-gke-quickstart/master/scripts/copy_vmr_to_gkr.sh
+wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/scripts/copy_vmr_to_gkr.sh
 chmod 755 copy_vmr_to_gkr.sh
 ./copy_vmr_to_gkr.sh -u   http://em.solace.com/???
 ```
 
 * The script will end with a link required for next step.  You can view the new entry on the google container registry in the google cloud console.
 
-![alt text](https://raw.githubusercontent.com/KenBarr/solace-gke-quickstart/master/images/google_container_registry.png "Google Container Registry")
+![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/google_container_registry.png "Google Container Registry")
 
 4. Use google cloud console to create GKE cluster of one node and deploy pod and service to that cluster.  This will finish with a Solace VMR deployed to GKE
 
 * Download and execute the clustre create and deployment script in the google cloud shell.  Replace ??? with the release tag of the image in the container registry.
 
 ```Shell
-wget https://raw.githubusercontent.com/KenBarr/solace-gke-quickstart/master/scripts/start_vmr.sh
+wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/scripts/start_vmr.sh
 chmod 755 start_vmr.sh 
 ./start_vmr.sh -i gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:???
 ```
@@ -88,23 +94,23 @@ NodePort:               80      31918/TCP
 
 Note here serveral IPs and port.  In this example 104.154.54.154 is the external IP to use,  This can also be seen from the goolge cloud console:
 
-![alt text](https://raw.githubusercontent.com/KenBarr/solace-gke-quickstart/master/images/google_container_loadbalancer.png "GKE Load Balancer")
+![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/google_container_loadbalancer.png "GKE Load Balancer")
 
 ## Gaining admin access to the VMR
 
 For persons used to working with Solace message router console access, this is still available with standard ssh session from any internet:
 
-![alt text](https://raw.githubusercontent.com/KenBarr/solace-gke-quickstart/master/images/solace_console.png "SolOS CLI")
+![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/solace_console.png "SolOS CLI")
 
 For persons who are unfamiliar with the Solace mesage router or would prefer an administration application the SolAdmin management application is available.  For more information on SolAdmin see the [SolAdmin page](http://dev.solace.com/tech/soladmin/).  To get SolAdmin, visit the Solace [download page](http://dev.solace.com/downloads/) and select OS version desired.  Management IP will be the Public IP associated with youe GCE instance and port will be 8080 by default.
 
-![alt text](https://raw.githubusercontent.com/KenBarr/solace-gke-quickstart/master/images/gce_soladmin.png "soladmin connection to gce")
+![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/gce_soladmin.png "soladmin connection to gce")
 
 ## Testing data access to the VMR
 
 To test data traffic though the newly created VMR instance, visit the Solace developer portal and and select your preferred programming langauge to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started.
 
-![alt text](https://raw.githubusercontent.com/KenBarr/solace-gke-quickstart/master/images/solace_tutorial.png "getting started publish/subscribe")
+![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/solace_tutorial.png "getting started publish/subscribe")
 
 ## Contributing
 
@@ -112,7 +118,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ## Authors
 
-See the list of [contributors](https://github.com/KenBarr/solace-gke-quickstart/graphs/contributors) who participated in this project.
+See the list of [contributors](https://github.com/SolaceProducts/solace-gke-quickstart/graphs/contributors) who participated in this project.
 
 ## License
 
