@@ -43,7 +43,7 @@ This is a 4 step process:
 ```Shell
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/scripts/copy_vmr_to_gkr.sh
 chmod 755 copy_vmr_to_gkr.sh
-./copy_vmr_to_gkr.sh -u   http://em.solace.com/???
+./copy_vmr_to_gkr.sh -u http://em.solace.com/???
 ```
 
 * The script will end with a link required for next step.  You can view the new entry on the google container registry in the google cloud console.
@@ -52,12 +52,12 @@ chmod 755 copy_vmr_to_gkr.sh
 
 4. Use google cloud console to create GKE cluster of one node and deploy pod and service to that cluster.  This will finish with a Solace VMR deployed to GKE
 
-* Download and execute the clustre create and deployment script in the google cloud shell.  Replace ??? with the release tag of the image in the container registry.
+* Download and execute the clustre create and deployment script in the google cloud shell.  Replace &lt;password&gt; with a unique password. Replace ??? with the release tag of the image in the container registry.
 
 ```Shell
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/scripts/start_vmr.sh
 chmod 755 start_vmr.sh 
-./start_vmr.sh -i gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:???
+./start_vmr.sh -p <password> -i gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:???
 ```
 
 * Now you can validate you deployment, in the google cloud shell:
@@ -95,6 +95,12 @@ NodePort:               80      31918/TCP
 Note here serveral IPs and port.  In this example 104.154.54.154 is the external IP to use,  This can also be seen from the goolge cloud console:
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/google_container_loadbalancer.png "GKE Load Balancer")
+
+## Viewing bringup logs
+
+It is possible to watch the VMR come up via logs in the Google Cloud Platform log stack.  Inside Logging look for GKE Container, solace-vmr-cluster.  In the example below the Solace admin password was not set, therefore the container would not come up and exited.
+
+![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/gke_log_stack.png "GKE Log Stack")
 
 ## Gaining admin access to the VMR
 
