@@ -27,20 +27,20 @@ This is a 4 step process:
 
      [ENABLE THE API](https://console.cloud.google.com/flows/enableapi?apiid=containerregistry.googleapis.com)
 
-2. Go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink.  This link is of the form "http<nolink>://em.solace.com ?" will be needed in the following section.
+1. Go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink.  This link is of the form "http<nolink>://em.solace.com ?" will be needed in the following section.
 
 <a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
     <img src="https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/68545/images/register.png"/>
 </a>
 
-3. Place Solace VMR in Google Container Registry:
+1. Place Solace VMR in Google Container Registry:
 * Open a cloud shell. From the google cloud console used to create the project open a shell:
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/launch_google_cloud_shell.png "Google Cloud Shell")
 
 * In the cloud shell paste the following, (replace http<nolink>://em.solace.com/??? with the link recieved in email from step 2.)
 
-```Shell
+```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/scripts/copy_vmr_to_gkr.sh
 chmod 755 copy_vmr_to_gkr.sh
 ./copy_vmr_to_gkr.sh -u http://em.solace.com/???
@@ -50,19 +50,19 @@ chmod 755 copy_vmr_to_gkr.sh
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/google_container_registry.png "Google Container Registry")
 
-4. Use google cloud console to create GKE cluster of one node and deploy pod and service to that cluster.  This will finish with a Solace VMR deployed to GKE
+1. Use google cloud console to create GKE cluster of one node and deploy pod and service to that cluster.  This will finish with a Solace VMR deployed to GKE
 
 * Download and execute the clustre create and deployment script in the google cloud shell.  Replace &lt;password&gt; with a unique password. Replace ??? with the release tag of the image in the container registry.
 
-```Shell
-wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/scripts/start_vmr.sh
-chmod 755 start_vmr.sh 
+```sh
+wget https://raw.githubusercontent.com/SolaceProducts/solace-kubernetes-quickstart/68545/scripts/start_vmr.sh
+chmod 755 start_vmr.sh
 ./start_vmr.sh -p <password> -i gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:???
 ```
 
 * Now you can validate you deployment, in the google cloud shell:
 
-```Shell
+```sh
 prompt:~$ kubectl get deployment,svc,pods,pvc
 
 NAME            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
