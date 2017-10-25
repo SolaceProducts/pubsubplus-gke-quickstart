@@ -52,7 +52,7 @@ chmod 755 copy_vmr_to_gkr.sh
 
 1. Use google cloud console to create GKE cluster of one node and deploy pod and service to that cluster.  This will finish with a Solace VMR deployed to GKE
 
-* Download and execute the clustre create and deployment script in the google cloud shell.  Replace &lt;password&gt; with a unique password. Replace ??? with the release tag of the image in the container registry.
+* Download and execute the cluster create and deployment script in the google cloud shell.  Replace &lt;password&gt; with a unique password. Replace ??? with the release tag of the image in the container registry.
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-kubernetes-quickstart/68545/scripts/start_vmr.sh
