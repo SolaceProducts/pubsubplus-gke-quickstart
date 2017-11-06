@@ -10,7 +10,7 @@ The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capa
 
 ## How to Deploy a VMR onto GKE
 
-This is a 4 step process:
+This is a 5 step process:
 
 [//]:# (Section 1 prereq is direct copy from here:  https://cloud.google.com/container-registry/docs/quickstart)
 
@@ -50,7 +50,17 @@ chmod 755 copy_vmr_to_gkr.sh
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/google_container_registry.png "Google Container Registry")
 
-4. Use google cloud console to create GKE cluster of one node and deploy pod and service to that cluster.  This will finish with a Solace VMR deployed to GKE.
+4. Use google cloud console to create GKE cluster of one node.
+
+* Download and execute the cluster create script in the google cloud shell. All argument defaults should be ok for this example:
+
+```sh
+wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/scripts/create_cluster.sh
+chmod 755 screate_cluster.sh
+./create_cluster.sh
+```
+
+5. Use google cloud console to deploy pod and service to that cluster.  This will finish with a Solace VMR deployed to GKE.
 
 * Download and execute the cluster create and deployment script in the google cloud shell.  Replace &lt;password&gt; with a unique password. Replace ??? with the release tag of the image in the container registry.
 
