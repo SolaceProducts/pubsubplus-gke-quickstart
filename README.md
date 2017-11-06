@@ -56,7 +56,7 @@ chmod 755 copy_vmr_to_gkr.sh
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/scripts/create_cluster.sh
-chmod 755 screate_cluster.sh
+chmod 755 create_cluster.sh
 ./create_cluster.sh
 ```
 
