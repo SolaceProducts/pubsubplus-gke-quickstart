@@ -67,7 +67,7 @@ chmod 755 create_cluster.sh
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-kubernetes-quickstart/68545/scripts/start_vmr.sh
 chmod 755 start_vmr.sh
-./start_vmr.sh -p <password> -i gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:???
+./start_vmr.sh -p <password> -i gcr.io/${DEVSHELL_PROJECT_ID}/soltr-vmr:???
 ```
 
 * Now you can validate your deployment in the google cloud shell:
