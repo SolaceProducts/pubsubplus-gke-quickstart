@@ -2,7 +2,7 @@
 
 ## Purpose of this repository
 
-This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to provide a concrete example of how to deploy a Solace VMR on Google Container Engine on a single node GKE cluster.
+This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to provide a concrete example of how to deploy a Solace VMR in standalone non-HA configuration on Google Container Engine on a single node GKE cluster.
 
 ## Description of Solace VMR
 
@@ -39,14 +39,14 @@ This is a 5 step process:
 
 3. Place Solace VMR in Google Container Registry:
 
-* Open a cloud shell. From the google cloud console used to create the project open a shell:
+* Open a Google Cloud Shell from the Cloud Platform Console used to create the project, like this:
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/launch_google_cloud_shell.png "Google Cloud Shell")
 
 <br>
 <br>
 
-* In the cloud shell paste the following, (replace http<nolink>://em.solace.com/??? with the link recieved in email from step 2.)
+* In the Cloud Shell paste the following, (replace http<nolink>://em.solace.com/??? with the link recieved in email from step 2.)
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/scripts/copy_vmr_to_gkr.sh
@@ -57,7 +57,7 @@ chmod 755 copy_vmr_to_gkr.sh
 <br>
 <br>
 
-* The script will end with a link required for next step.  You can view the new entry on the google container registry in the google cloud console.
+* The script will end with a link required for next step.  You can view the new entry on the google container registry in the Cloud Platform Console.
 
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/google_container_registry.png "Google Container Registry")
@@ -65,9 +65,9 @@ chmod 755 copy_vmr_to_gkr.sh
 <br>
 <br>
 
-4. Use google cloud console to create GKE cluster of one node.
+4. Use Google Cloud Shell to create GKE cluster of one node.
 
-* Download and execute the cluster create script in the google cloud shell. All argument defaults should be ok for this example:
+* Download and execute the cluster create script in the Google Cloud Shell. All argument defaults should be ok for this example:
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/scripts/create_cluster.sh
@@ -78,9 +78,9 @@ chmod 755 create_cluster.sh
 <br>
 <br>
 
-5. Use google cloud console to deploy pod and service to that cluster.  This will finish with a Solace VMR deployed to GKE.
+5. Use Google Cloud Shell to deploy Pod and Service to that cluster.  This will finish with a Solace VMR deployed to GKE.
 
-* Download and execute the cluster create and deployment script in the google cloud shell.  Replace `<YourAdminPassword>` with the desired password for the management `admin` user. Replace `<releaseTag>` with the release tag of the image in the container registry.
+* Download and execute the cluster create and deployment script in the Google Cloud Shell.  Replace `<YourAdminPassword>` with the desired password for the management `admin` user. Replace `<releaseTag>` with the release tag of the image in the container registry.
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-kubernetes-quickstart/68545/scripts/start_vmr.sh
@@ -91,7 +91,15 @@ chmod 755 start_vmr.sh
 <br>
 <br>
 
-* Now you can validate your deployment in the google cloud shell:
+#### Using other VMR deployment configurations
+
+In current configuration above script has created and started a small size non-HA VMR deployment with simple local non-persistent storage.
+
+For other deployment configuration options refer to the [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart).
+
+### Validate the Deployment
+
+Now you can validate your deployment in the Google Cloud Shell:
 
 ```sh
 prompt:~$kubectl get statefulset,services,pods,pvc
@@ -132,7 +140,7 @@ Note here serveral IPs and port.  In this example 104.154.54.154 is the external
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/google_container_loadbalancer.png "GKE Load Balancer")
 
-## Viewing bringup logs
+### Viewing bringup logs
 
 It is possible to watch the VMR come up via logs in the Google Cloud Platform log stack.  Inside Logging look for GKE Container, solace-vmr-cluster.  In the example below the Solace admin password was not set, therefore the container would not come up and exited.
 
