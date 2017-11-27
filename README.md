@@ -27,6 +27,10 @@ This is a 5 step process:
 
      [ENABLE THE API](https://console.cloud.google.com/flows/enableapi?apiid=containerregistry.googleapis.com)
 
+
+<br>
+<br>
+
 2. Use the button below to go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink. This link is of the form "http<nolink>://em.solace.com/???" and will be needed in the following section.
 
 <a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
@@ -34,10 +38,12 @@ This is a 5 step process:
 </a>
 
 3. Place Solace VMR in Google Container Registry:
+
 * Open a cloud shell. From the google cloud console used to create the project open a shell:
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/launch_google_cloud_shell.png "Google Cloud Shell")
 
+<br>
 <br>
 
 * In the cloud shell paste the following, (replace http<nolink>://em.solace.com/??? with the link recieved in email from step 2.)
@@ -49,10 +55,14 @@ chmod 755 copy_vmr_to_gkr.sh
 ```
 
 <br>
+<br>
+
 * The script will end with a link required for next step.  You can view the new entry on the google container registry in the google cloud console.
+
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/google_container_registry.png "Google Container Registry")
 
+<br>
 <br>
 
 4. Use google cloud console to create GKE cluster of one node.
@@ -66,6 +76,7 @@ chmod 755 create_cluster.sh
 ```
 
 <br>
+<br>
 
 5. Use google cloud console to deploy pod and service to that cluster.  This will finish with a Solace VMR deployed to GKE.
 
@@ -78,6 +89,8 @@ chmod 755 start_vmr.sh
 ```
 
 <br>
+<br>
+
 * Now you can validate your deployment in the google cloud shell:
 
 ```sh
@@ -125,6 +138,7 @@ It is possible to watch the VMR come up via logs in the Google Cloud Platform lo
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/gke_log_stack.png "GKE Log Stack")
 
+<br>
 <br>
 
 ## Gaining admin access to the VMR
