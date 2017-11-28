@@ -1,8 +1,8 @@
-# Install a Solace Message Router onto a Google Container Engine, (gke), cluster
+# Install a Solace Message Router onto a Google Container Engine (gke), cluster
 
 ## Purpose of this repository
 
-This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to provide a concrete example of how to deploy a Solace VMR on Google Container Engine on a single node GKE cluster.
+This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to provide a concrete example of how to deploy a Solace VMR in standalone non-HA configuration on Google Container Engine on a single node GKE cluster.
 
 ## Description of Solace VMR
 
@@ -27,18 +27,26 @@ This is a 5 step process:
 
      [ENABLE THE API](https://console.cloud.google.com/flows/enableapi?apiid=containerregistry.googleapis.com)
 
-2. Go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink.  This link is of the form "http<nolink>://em.solace.com ?" will be needed in the following section.
+
+<br>
+<br>
+
+2. Use the button below to go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink. This link is of the form "http<nolink>://em.solace.com/???" and will be needed in the following section.
 
 <a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
     <img src="https://raw.githubusercontent.com/SolaceProducts/solace-kubernetes-quickstart/68545/images/register.png"/>
 </a>
 
 3. Place Solace VMR in Google Container Registry:
-* Open a cloud shell. From the google cloud console used to create the project open a shell:
+
+* Open a Google Cloud Shell from the Cloud Platform Console used to create the project, like this:
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/launch_google_cloud_shell.png "Google Cloud Shell")
 
-* In the cloud shell paste the following, (replace http<nolink>://em.solace.com/??? with the link recieved in email from step 2.)
+<br>
+<br>
+
+* In the Cloud Shell paste the following, (replace http<nolink>://em.solace.com/??? with the link recieved in email from step 2.)
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/scripts/copy_vmr_to_gkr.sh
@@ -46,13 +54,20 @@ chmod 755 copy_vmr_to_gkr.sh
 ./copy_vmr_to_gkr.sh -u http://em.solace.com/???
 ```
 
-* The script will end with a link required for next step.  You can view the new entry on the google container registry in the google cloud console.
+<br>
+<br>
+
+* The script will end with a link required for next step.  You can view the new entry on the google container registry in the Cloud Platform Console.
+
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/google_container_registry.png "Google Container Registry")
 
-4. Use google cloud console to create GKE cluster of one node.
+<br>
+<br>
 
-* Download and execute the cluster create script in the google cloud shell. All argument defaults should be ok for this example:
+4. Use Google Cloud Shell to create GKE cluster of one node.
+
+* Download and execute the cluster create script in the Google Cloud Shell. All argument defaults should be ok for this example:
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/scripts/create_cluster.sh
@@ -60,73 +75,113 @@ chmod 755 create_cluster.sh
 ./create_cluster.sh
 ```
 
-5. Use google cloud console to deploy pod and service to that cluster.  This will finish with a Solace VMR deployed to GKE.
+<br>
+<br>
 
-* Download and execute the cluster create and deployment script in the google cloud shell.  Replace &lt;password&gt; with a unique password. Replace ??? with the release tag of the image in the container registry.
+5. Use Google Cloud Shell to deploy Pod and Service to that cluster.  This will finish with a Solace VMR deployed to GKE.
+
+* Download and execute the cluster create and deployment script in the Google Cloud Shell.  Replace `<YourAdminPassword>` with the desired password for the management `admin` user. Replace `<releaseTag>` with the release tag of the image in the container registry.
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-kubernetes-quickstart/68545/scripts/start_vmr.sh
 chmod 755 start_vmr.sh
-./start_vmr.sh -p <password> -i gcr.io/${DEVSHELL_PROJECT_ID}/soltr-vmr:???
+./start_vmr.sh -p <YourAdminPassword> -i gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:<releaseTag>
 ```
 
-* Now you can validate your deployment in the google cloud shell:
+<br>
+<br>
+
+#### Using other VMR deployment configurations
+
+In current configuration above script has created and started a small size non-HA VMR deployment with simple local non-persistent storage.
+
+For other deployment configuration options refer to the [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart).
+
+### Validate the Deployment
+
+Now you can validate your deployment in the Google Cloud Shell:
 
 ```sh
-prompt:~$ kubectl get deployment,svc,pods,pvc
+prompt:~$kubectl get statefulset,services,pods,pvc
+NAME                                          DESIRED   CURRENT   AGE
+statefulsets/XXX-XXX-solace-kubernetes   1         1         2m
+NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                                       AGE
+svc/kubernetes                       ClusterIP      10.19.240.1     <none>           443/TCP                                       26m
+svc/XXX-XXX-solace-kubernetes   LoadBalancer   10.19.245.131   104.154.136.44   22:31061/TCP,8080:30037/TCP,55555:31723/TCP   2m
+NAME                                  READY     STATUS    RESTARTS   AGE
+po/XXX-XXX-solace-kubernetes-0   1/1       Running   0          2m
+NAME                                        STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS            AGE
+pvc/data-XXX-XXX-solace-kubernetes-0   Bound     pvc-63ce3ad3-cae1-11e7-ae62-42010a800120   30Gi       RWO            XXX-XXX-standard   2
 
-NAME            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-deploy/solace   1         1         1            1           1h
-NAME             CLUSTER-IP     EXTERNAL-IP      PORT(S)     AGE
-svc/kubernetes   XX.XX.XX.XX    <none>           443/TCP     18h
-svc/solace       10.15.250.74   104.154.54.154   80:31918/TCP,8080:31910/TCP,2222:31020/TCP,55555:32120/TCP,1883:32061/TCP   1h
-NAME                         READY     STATUS    RESTARTS   AGE
-po/solace-2554909293-tgqmk   1/1       Running   0          1h
-NAME       STATUS    VOLUME                                     CAPACITY   ACCESSMODES   STORAGECLASS   AGE
-pvc/dshm   Bound     pvc-5cb52cd8-b408-11e7-a882-42010af001ea   1Gi        RWO           standard       1h
 
-prompt:~$ kubectl describe service solace
-Name:                   solace
-Namespace:              default
-Labels:                 io.kompose.service=solace
-Annotations:            kompose.cmd=./kompose -f solace-compose.yaml up
-                        kompose.service.type=LoadBalancer
-                        kompose.version=
-Selector:               io.kompose.service=solace
-Type:                   LoadBalancer
-IP:                     10.15.250.74
-LoadBalancer Ingress:   104.154.54.154
-Port:                   80      80/TCP
-NodePort:               80      31918/TCP
+prompt:~$ kubectl describe service XXX-XXX-solace-kubernetes
+Name:                     XXX-XXX-solace-kubernetes
+Namespace:                default
+Labels:                   app=solace-kubernetes
+                          chart=solace-kubernetes-0.1.0
+                          heritage=Tiller
+                          release=XXX-XXX
+Annotations:              <none>
+Selector:                 app=solace-kubernetes,release=XXX-XXX
+Type:                     LoadBalancer
+IP:                       10.19.245.131
+LoadBalancer Ingress:     104.154.54.154
+Port:                     ssh  22/TCP
+TargetPort:               22/TCP
+NodePort:                 ssh  31061/TCP
+Endpoints:                10.16.0.12:22
 :
 :
 ```
+
+<br>
 
 Note here serveral IPs and port.  In this example 104.154.54.154 is the external IP to use,  This can also be seen from the google cloud console:
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/google_container_loadbalancer.png "GKE Load Balancer")
 
-## Viewing bringup logs
+### Viewing bringup logs
 
 It is possible to watch the VMR come up via logs in the Google Cloud Platform log stack.  Inside Logging look for GKE Container, solace-vmr-cluster.  In the example below the Solace admin password was not set, therefore the container would not come up and exited.
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/gke_log_stack.png "GKE Log Stack")
 
+<br>
+<br>
+
 ## Gaining admin access to the VMR
 
-For persons used to working with Solace message router console access, this is still available with standard ssh session from any internet:
+For persons used to working with Solace message router console access, this is still available with standard ssh session from any internet at port 22 by default:
 
-![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/solace_console.png "SolOS CLI")
+```sh
+$ssh -p 22 admin@104.154.54.154
+Solace - Virtual Message Router (VMR)
+Password:
+
+System Software. SolOS-TR Version 8.6.0.1010
+
+Virtual Message Router (Message Routing Node)
+
+Copyright 2004-2017 Solace Corporation. All rights reserved.
+
+This is the Community Edition of the Solace VMR.
+
+XXX-XXX-solace-kubernetes-0>
+```
 
 For persons who are unfamiliar with the Solace mesage router or would prefer an administration application the SolAdmin management application is available.  For more information on SolAdmin see the [SolAdmin page](http://dev.solace.com/tech/soladmin/).  To get SolAdmin, visit the Solace [download page](http://dev.solace.com/downloads/) and select OS version desired.  Management IP will be the Public IP associated with youe GCE instance and port will be 8080 by default.
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/gce_soladmin.png "soladmin connection to gce")
+
+<br>
 
 ## Testing data access to the VMR
 
 To test data traffic though the newly created VMR instance, visit the Solace developer portal and select your preferred programming langauge to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/). Under each language there is a Publish/Subscribe tutorial that will help you get started.
 
 ![alt text](https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/68545/images/solace_tutorial.png "getting started publish/subscribe")
+
+<br>
 
 ## Contributing
 
