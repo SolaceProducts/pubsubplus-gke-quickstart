@@ -95,7 +95,7 @@ chmod 755 start_vmr.sh
 
 In current configuration above script has created and started a small size non-HA VMR deployment with simple local non-persistent storage.
 
-For other deployment configuration options refer to the [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart).
+For other deployment configuration options refer to the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/blob/master/README.md).
 
 ### Validate the Deployment
 
