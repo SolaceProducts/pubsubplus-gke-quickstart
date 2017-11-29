@@ -1,4 +1,0 @@
-[submodule "submodules/solace-kubernetes-quickstart"]
-	path = submodules/solace-kubernetes-quickstart
-	url = https://github.com/SolaceProducts/solace-kubernetes-quickstart
-	branch = 68545
