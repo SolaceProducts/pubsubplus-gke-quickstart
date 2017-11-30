@@ -34,7 +34,7 @@ This is a 5 step process:
 2. Use the button below to go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink. This link is of the form "http<nolink>://em.solace.com/" and will be needed in the following section.
 
 <a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
-    <img src="https://raw.githubusercontent.com/SolaceProducts/solace-kubernetes-quickstart/master/images/register.png"/>
+    <img src="/images/register.png"/>
 </a>
 
 3. Place Solace VMR in Google Container Registry:
@@ -59,7 +59,6 @@ chmod 755 copy_vmr_to_gkr.sh
 
 * The script will end with a link required for next step.  You can view the new entry on the google container registry in the Cloud Platform Console.
 
-
 ![alt text](/images/google_container_registry.png "Google Container Registry")
 
 <br>
@@ -67,13 +66,18 @@ chmod 755 copy_vmr_to_gkr.sh
 
 4. Use Google Cloud Shell to create GKE cluster of one node.
 
-* Download and execute the cluster create script in the Google Cloud Shell. All argument defaults should be ok for this example:
+* Download and execute the cluster create script in the Google Cloud Shell. All argument defaults would be ok if you want a single VMR, or HA Cluster in a single GCP zone.  If you want the VMR cluster spead across 3 zones within a region,(Recommended for production), the speficy the 3 zones as per the example below:
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/create_cluster.sh
 chmod 755 create_cluster.sh
-./create_cluster.sh
+./create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f
 ```
+
+This will create a GKE cluster of 3 nodes spread across 3 zones:
+
+![alt text](/images/Nodes_across_zones.png "Google Contain Engine nodes")
+
 
 <br>
 <br>
@@ -102,36 +106,56 @@ For other deployment configuration options refer to the [Solace Kubernetes Quick
 Now you can validate your deployment in the Google Cloud Shell:
 
 ```sh
-prompt:~$kubectl get statefulset,services,pods,pvc
-NAME                                  DESIRED   CURRENT   AGE
-statefulsets/XXX-XXX-solace           1         1         2m
-NAME                         TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                                       AGE
-svc/kubernetes               ClusterIP      10.19.240.1     <none>           443/TCP                                       26m
-svc/XXX-XXX-solace           LoadBalancer   10.19.245.131   104.154.136.44   22:31061/TCP,8080:30037/TCP,55555:31723/TCP   2m
-NAME                          READY     STATUS    RESTARTS   AGE
-po/XXX-XXX-solace-0           1/1       Running   0          2m
-NAME                         STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS            AGE
-pvc/data-XXX-XXX-solace-0    Bound     pvc-63ce3ad3-cae1-11e7-ae62-42010a800120   30Gi       RWO            XXX-XXX-standard        2
+prompt:~$ kubectl get statefulsets,services,pods,pvc,pv
+NAME                                 DESIRED   CURRENT   AGE
+statefulsets/XXX-XXX-solace   3         3         3m
+NAME                                  TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                                       AGE
+svc/XXX-XXX-solace             LoadBalancer   10.15.249.186   35.202.131.158   22:32656/TCP,8080:32394/TCP,55555:31766/TCP   3m
+svc/XXX-XXX-solace-discovery   ClusterIP      None            <none>           8080/TCP                                      3m
+svc/kubernetes                        ClusterIP      10.15.240.1     <none>           443/TCP                                       6d
+NAME                         READY     STATUS    RESTARTS   AGE
+po/XXX-XXX-solace-0   1/1       Running   0          3m
+po/XXX-XXX-solace-1   0/1       Running   0          3m
+po/XXX-XXX-solace-2   0/1       Running   0          3m
+NAME                               STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS              AGE
+pvc/data-XXX-XXX-solace-0   Bound     pvc-74d9ceb3-d492-11e7-b95e-42010a800173   30Gi       RWO            XXX-XXX-standard   3m
+pvc/data-XXX-XXX-solace-1   Bound     pvc-74dce76f-d492-11e7-b95e-42010a800173   30Gi       RWO            XXX-XXX-standard   3m
+pvc/data-XXX-XXX-solace-2   Bound     pvc-74e12b36-d492-11e7-b95e-42010a800173   30Gi       RWO            XXX-XXX-standard   3m
+NAME                                          CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM                                  STORAGECLASS              REASON    AGE
+pv/pvc-74d9ceb3-d492-11e7-b95e-42010a800173   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-0   XXX-XXX-standard             3m
+pv/pvc-74dce76f-d492-11e7-b95e-42010a800173   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-1   XXX-XXX-standard             3m
+pv/pvc-74e12b36-d492-11e7-b95e-42010a800173   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-2   XXX-XXX-standard             3m
 
 
-prompt:~$ kubectl describe service XXX-XXX-solace
-Name:                     XXX-XXX-solace
+prompt:~$ kubectl describe service XXX-XX-solace
+Name:                     XXX-XX-solace
 Namespace:                default
 Labels:                   app=solace
                           chart=solace-0.1.0
                           heritage=Tiller
-                          release=XXX-XXX
+                          release=XXX-XX
 Annotations:              <none>
 Selector:                 app=solace,release=XXX-XXX
 Type:                     LoadBalancer
-IP:                       10.19.245.131
-LoadBalancer Ingress:     104.154.54.154
+IP:                       10.15.249.186
+LoadBalancer Ingress:     35.202.131.158
 Port:                     ssh  22/TCP
 TargetPort:               22/TCP
-NodePort:                 ssh  31061/TCP
-Endpoints:                10.16.0.12:22
+NodePort:                 ssh  32656/TCP
+Endpoints:                10.12.7.6:22
+Port:                     semp  8080/TCP
+TargetPort:               8080/TCP
+NodePort:                 semp  32394/TCP
+Endpoints:                10.12.7.6:8080
+Port:                     smf  55555/TCP
+TargetPort:               55555/TCP
+NodePort:                 smf  31766/TCP
+Endpoints:                10.12.7.6:55555
+Session Affinity:         None
+External Traffic Policy:  Cluster
 :
 :
+
 ```
 
 <br>
