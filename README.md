@@ -31,9 +31,9 @@ This is a 5 step process:
 <br>
 <br>
 
-2. Use the button below to go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink. This link is of the form "http<nolink>://em.solace.com/" and will be needed in the following section.
+2. Use the button below to go to the Solace Developer portal and request a Solace Evaluation edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Evaluation Edition for Docker" hyperlink. This link is of the form "http<nolink>://em.solace.com/" and will be needed in the following section.
 
-<a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
+<a href="http://dev.solace.com/downloads/download-vmr-evaluation-edition-docker" target="_blank">
     <img src="/images/register.png"/>
 </a>
 
@@ -49,7 +49,7 @@ This is a 5 step process:
 * In the Cloud Shell paste the following, (replace http<nolink>://em.solace.com/ with the link recieved in email from step 2.)
 
 ```sh
-wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/copy_vmr_to_gkr.sh
+wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/SOL-1245/scripts/copy_vmr_to_gkr.sh
 chmod 755 copy_vmr_to_gkr.sh
 ./copy_vmr_to_gkr.sh -u http://em.solace.com/
 ```
