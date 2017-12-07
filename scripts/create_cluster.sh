@@ -52,7 +52,7 @@ shift $((OPTIND-1))
 [ "$1" = "--" ] && shift
 
 verbose=1
-echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type},image_type=${image_type},  number_of_nodes=${number_of_nodes} zone=${zone} ,Leftovers: $@"
+echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, image_type=${image_type}, number_of_nodes=${number_of_nodes}, zones=${zones} ,Leftovers: $@"
 
 echo "`date` INFO: INITIALIZE GCLOUD"
 echo "#############################################################"
