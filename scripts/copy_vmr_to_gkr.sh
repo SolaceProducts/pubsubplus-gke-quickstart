@@ -88,6 +88,6 @@ echo "#################################"
 docker rmi gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}
 docker rmi ${imageId}
 
-export SOLACE_IMAGE=gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}
+export SOLACE_IMAGE_URL=gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}
 echo "`date` INFO: Record the image reference in the GCR you will need to for next steps"
-echo "SOLACE_IMAGE=gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}"
+echo "SOLACE_IMAGE_URL=gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}"
