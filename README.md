@@ -31,9 +31,9 @@ This is a 5 step process:
 <br>
 <br>
 
-2. Use the button below to go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink. This link is of the form "http<nolink>://em.solace.com/" and will be needed in the following section.
+2. Use the button below to go to the Solace Developer portal and request a Solace Evaluation edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Evaluation Edition for Docker" hyperlink. This link is of the form "http<nolink>://em.solace.com/" and will be needed in the following section.
 
-<a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
+<a href="http://dev.solace.com/downloads/download-vmr-evaluation-edition-docker" target="_blank">
     <img src="/images/register.png"/>
 </a>
 
@@ -49,7 +49,7 @@ This is a 5 step process:
 * In the Cloud Shell paste the following, (replace http<nolink>://em.solace.com/ with the link recieved in email from step 2.)
 
 ```sh
-wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/copy_vmr_to_gkr.sh
+wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/SOL-1245/scripts/copy_vmr_to_gkr.sh
 chmod 755 copy_vmr_to_gkr.sh
 ./copy_vmr_to_gkr.sh -u http://em.solace.com/
 ```
@@ -69,7 +69,7 @@ chmod 755 copy_vmr_to_gkr.sh
 * Download and execute the cluster create script in the Google Cloud Shell. All argument defaults would be ok if you want a single VMR, or HA Cluster in a single GCP zone.  If you want the VMR cluster spead across 3 zones within a region,(Recommended for production), the speficy the 3 zones as per the example below:
 
 ```sh
-wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/create_cluster.sh
+wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/SOL-1245/scripts/create_cluster.sh
 chmod 755 create_cluster.sh
 ./create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f
 ```
@@ -87,7 +87,7 @@ This will create a GKE cluster of 3 nodes spread across 3 zones:
 * Download and execute the cluster create and deployment script in the Google Cloud Shell.  Replace `<YourAdminPassword>` with the desired password for the management `admin` user. Replace `<releaseTag>` with the release tag of the image in the container registry.
 
 ```sh
-wget https://raw.githubusercontent.com/SolaceProducts/solace-kubernetes-quickstart/master/scripts/start_vmr.sh
+wget https://raw.githubusercontent.com/SolaceProducts/solace-kubernetes-quickstart/SOL-1244/scripts/start_vmr.sh
 chmod 755 start_vmr.sh
 ./start_vmr.sh -p <YourAdminPassword> -i gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:<releaseTag>
 ```
