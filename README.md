@@ -6,10 +6,10 @@ This repository expands on [Solace Kubernetes Quickstart](https://github.com/Sol
 
 ![alt text](/images/network_diagram.png "Network Diagram")
 
-Purple - Data – Client data including active node mgmt.
-Blue   - DNS  – HA node discovery.
-Black  - Disk – Persistent disk mount.
-Orange - Mgmt – Direct CLI/SEMP.
+- Purple - Data – Client data including active node mgmt.
+- Blue   - DNS  – HA node discovery.
+- Black  - Disk – Persistent disk mount.
+- Orange - Mgmt – Direct CLI/SEMP.
 
 ## Description of Solace VMR
 
