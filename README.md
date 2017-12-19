@@ -2,11 +2,18 @@
 
 ## Purpose of this repository
 
-This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to provide a concrete example of how to deploy a Solace VMR in standalone non-HA configuration on Google Container Engine on a single node GKE cluster.
+This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to provide a concrete example of how to deploy redundent Solace VMRs in HA configuration on Google Container Engine on a 3 node GKE cluster across 3 zones.
+
+![alt text](/images/network_diagram.png "Network Diagram")
+
+Purple - Data – Client data including active node mgmt.
+Blue   - DNS  – HA node discovery.
+Black  - Disk – Persistent disk mount.
+Orange - Mgmt – Direct CLI/SEMP.
 
 ## Description of Solace VMR
 
-The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capabilities deployable in any computing environment. The VMR provides the same rich feature set as Solace’s proven hardware appliances, with the same open protocol support, APIs and common management. The VMR can be deployed in the datacenter or natively within all popular private and public clouds.
+Solace Virtual Message Router (VMR) software provides enterprise-grade messaging capabilities so you can easily enable event-driven communications between applications, IoT devices, microservices and mobile devices across hybrid cloud and multi cloud environments. The Solace VMR supports open APIs and standard protocols including AMQP 1.0, JMS, MQTT, REST and WebSocket, along with all message exchange patterns including publish/subscribe, request/reply, fan-in/fan-out, queueing, streaming and more. The Solace VMR can be deployed in all popular public cloud, private cloud and on-prem environments, and offers both feature parity and interoperability with Solace’s proven hardware appliances and Messaging as a Service offering called Solace Cloud.
 
 ## How to Deploy a VMR onto GKE
 
