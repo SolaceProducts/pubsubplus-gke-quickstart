@@ -1,8 +1,8 @@
-# Install a Solace Message Router onto a Google Container Engine (gke), cluster
+# Install Solace Message Router HA deployment onto a Google Kubernetes Engine (gke), cluster
 
 ## Purpose of this repository
 
-This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to provide a concrete example of how to deploy redundent Solace VMRs in HA configuration on Google Container Engine on a 3 node GKE cluster across 3 zones.
+This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to provide a concrete example of how to deploy redundent Solace VMRs in HA configuration on Google Kubernetes Engine on a 3 node GKE cluster across 3 zones.  If you are looking for a simple way to install a single Solace message router into GCP, please see [Solace GCP Quickstart](https://github.com/SolaceLabs/solace-gcp-quickstart).
 
 ![alt text](/images/network_diagram.png "Network Diagram")
 
@@ -85,6 +85,14 @@ This will create a GKE cluster of 3 nodes spread across 3 zones:
 
 ![alt text](/images/Nodes_across_zones.png "Google Contain Engine nodes")
 
+You can sets that the Kubernetes deployment on GKE is healthy with the following command, which should retun a single line with svc/kubernetes:
+
+```sh
+kubectl get services
+```
+If this fails, you will need to [troubleshoot GKE](https://cloud.google.com/kubernetes-engine/docs/support).
+
+Also note that during install of GKE and release Solace HA, several GCP resources such as GCE nodes, Disks, and Loadbalancers are created.  After deleting kubernetes release you should validate all resources created are deleted.  The [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) describes how to delete a release.
 
 <br>
 <br>
