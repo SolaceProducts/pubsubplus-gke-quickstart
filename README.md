@@ -2,7 +2,7 @@
 
 ## Purpose of this repository
 
-This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to provide a concrete example of how to deploy redundent Solace VMRs in HA configuration on Google Kubernetes Engine on a 3 node GKE cluster across 3 zones.  If you are looking for a simple way to install a single Solace message router into GCP, please see [Solace GCP Quickstart](https://github.com/SolaceLabs/solace-gcp-quickstart).
+This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to provide a concrete example of how to deploy redundant Solace VMRs in HA configuration on Google Kubernetes Engine on a 3 node GKE cluster across 3 zones.  If you are looking for a simple way to install a single Solace message router into GCP, please see [Solace GCP Quickstart](https://github.com/SolaceLabs/solace-gcp-quickstart).
 
 ![alt text](/images/network_diagram.png "Network Diagram")
 
@@ -21,32 +21,33 @@ This is a 5 step process:
 
 [//]:# (Section 1 prereq is direct copy from here:  https://cloud.google.com/container-registry/docs/quickstart)
 
-Step 1. Create a project in Google Cloud Platform and enable prerequisites:
-     * In the Cloud Platform Console, go to the Manage resources page and select or create a new project.
+**Step 1**: Create a project in Google Cloud Platform and enable prerequisites:
 
-          [GO TO THE MANAGE RESOURCES PAGE](https://console.cloud.google.com/projectselector/iam-admin/projects)
+* In the Cloud Platform Console, go to the Manage resources page and select or create a new project.
 
-     * Enable billing for your project. Follow the guide from the below link.
+    [GO TO THE MANAGE RESOURCES PAGE](https://console.cloud.google.com/projectselector/iam-admin/projects)
 
-          [ENABLE BILLING](https://support.google.com/cloud/answer/6293499#enable-billing)
+* Enable billing for your project. Follow the guide from the below link.
 
-     * Enable the Container Registry API.  Follow the below link and select the project you created from above.
+    [ENABLE BILLING](https://support.google.com/cloud/answer/6293499#enable-billing)
 
-          [ENABLE THE API](https://console.cloud.google.com/flows/enableapi?apiid=containerregistry.googleapis.com)
+* Enable the Container Registry API.  Follow the below link and select the project you created from above.
+
+    [ENABLE THE API](https://console.cloud.google.com/flows/enableapi?apiid=containerregistry.googleapis.com)
 
 
 <br>
 <br>
 
-Step 2. Use the button below to go to the Solace Developer portal and request a Solace Evaluation edition VMR. This process will return an email with a Download link. In the email do a right click "Copy Hyperlink" on the "Download the VMR Evaluation Edition for Docker" hyperlink. This link is of the form "http<nolink>://em.solace.com/" and will be needed in the following section.
+**Step 2**: Use the button below to go to the Solace Developer portal and request a Solace Evaluation edition VMR. This process will return an email with a Download link. In the email do a right click "Copy Hyperlink" on the "Download the VMR Evaluation Edition for Docker" hyperlink. This link is of the form "http<nolink>://em.solace.com/" and will be needed in the following section.
 
-     Note: The Evaluation edition VMR is required to support HA deployment.
+Note: The Evaluation edition VMR is required to support HA deployment.
 
 <a href="http://dev.solace.com/downloads/download-vmr-evaluation-edition-docker" target="_blank">
     <img src="/images/register.png"/>
 </a>
 
-Step 3. Place Solace VMR in Google Container Registry:
+**Step 3**: Place Solace VMR in Google Container Registry:
 
 * Open a Google Cloud Shell from the Cloud Platform Console used to create the project, like this:
 
@@ -55,7 +56,7 @@ Step 3. Place Solace VMR in Google Container Registry:
 <br>
 <br>
 
-* In the Cloud Shell paste the following, (replace http<nolink>://em.solace.com/ with the link recieved in email from step 2.)
+* In the Cloud Shell paste the following, (replace http<nolink>://em.solace.com/ with the link received in email from step 2.)
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/copy_vmr_to_gkr.sh
@@ -72,41 +73,39 @@ chmod 755 copy_vmr_to_gkr.sh
 <br>
 <br>
 
-Step 4. Use Google Cloud Shell to create GKE cluster of three nodes.
+**Step 4**: Use Google Cloud Shell to create GKE cluster of three nodes.
 
 * Download and execute the cluster create script in the Google Cloud Shell. All argument defaults would be ok if you want a single non-HA VMR. Specify `-n = 3` as number of nodes and a single `-z <zone>` for an HA Cluster in a single GCP zone. If you want the VMR cluster spread across 3 zones within a region (recommended for production), then specify the 3 zones as per the example below but leave the number of nodes at default 1 (meaning one node per zone):
 
 ```sh
-wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/SOL-1245/scripts/create_cluster.sh
+wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/create_cluster.sh
 chmod 755 create_cluster.sh
 ./create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f
 ```
 
 This will create a GKE cluster of 3 nodes spread across 3 zones:
 
-![alt text](/images/Nodes_across_zones.png "Google Contain Engine nodes")
+![alt text](/images/Nodes_across_zones.png "Google Container Engine nodes")
 
-Additional create GKE cluster options:
+Further GKE `create_cluster.sh` options:
 * The default cluster name is "solace-vmr-cluster", which can be changed by specifying the `-c <cluster name>` command line argument.
 * The default machine type is "n1-standard-4". To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine type>`. Note that the minimum CPU and memory requirements must be satisfied for the targeted VMR size, see the next step.
 
 <br>
 
-You can check that the Kubernetes deployment on GKE is healthy with the following command, which should retun a single line with svc/kubernetes:
+You can check that the Kubernetes deployment on GKE is healthy with the following command, which should return a single line with svc/kubernetes:
 
 ```sh
 kubectl get services
 ```
-If this fails, you will need to [troubleshoot GKE](https://cloud.google.com/kubernetes-engine/docs/support).
+If this fails, you will need to [troubleshoot GKE](https://cloud.google.com/kubernetes-engine/docs/support ).
 
-Also note that during install of GKE and release Solace HA, several GCP resources such as GCE nodes, Disks, and Loadbalancers are created.  After deleting a kubernetes release you should validate that all resources created are deleted.  The [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) describes how to delete a release.
-
-Refer to the Google Cloud Engine documentation to [delete a GKE cluster](https://cloud.google.com/sdk/gcloud/reference/container/clusters/delete).
+Also note that during install of GKE and release Solace HA, several GCP resources such as GCE nodes, Disks, and Loadbalancers are created.  After deleting a Kubernetes release you should validate that all resources created are deleted.  The [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart(TODO) ) describes how to delete a release. If it is necessary to delete the GKE cluster refer to the [Google Cloud Platform documentation](https://cloud.google.com/sdk/gcloud/reference/container/clusters/delete ).
 
 <br>
 <br>
 
-Step 5. Use Google Cloud Shell to deploy Pod and Service to that cluster.  This will finish with a Solace VMR HA configuration deployed to GKE.
+**Step 5**: Use Google Cloud Shell to deploy Pod and Service to that cluster.  This will finish with a Solace VMR HA configuration deployed to GKE.
 
 * Download and execute the cluster create and deployment script in the Google Cloud Shell.  Replace `<YourAdminPassword>` with the desired password for the management `admin` user. Replace `<releaseTag>` with the release tag of the image in the container registry.
 
@@ -128,21 +127,21 @@ Now you can validate your deployment in the Google Cloud Shell:
 
 ```sh
 prompt:~$ kubectl get statefulsets,services,pods,pvc,pv
-NAME                                 DESIRED   CURRENT   AGE
+NAME                          DESIRED   CURRENT   AGE
 statefulsets/XXX-XXX-solace   3         3         3m
-NAME                                  TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                                       AGE
-svc/XXX-XXX-solace             LoadBalancer   10.15.249.186   35.202.131.158   22:32656/TCP,8080:32394/TCP,55555:31766/TCP   3m
+NAME                           TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                                       AGE
+svc/XXX-XXX-solace             LoadBalancer   10.15.249.186   104.154.54.154   22:32656/TCP,8080:32394/TCP,55555:31766/TCP   3m
 svc/XXX-XXX-solace-discovery   ClusterIP      None            <none>           8080/TCP                                      3m
-svc/kubernetes                        ClusterIP      10.15.240.1     <none>           443/TCP                                       6d
-NAME                         READY     STATUS    RESTARTS   AGE
+svc/kubernetes                 ClusterIP      10.15.240.1     <none>           443/TCP                                       6d
+NAME                  READY     STATUS    RESTARTS   AGE
 po/XXX-XXX-solace-0   1/1       Running   0          3m
 po/XXX-XXX-solace-1   0/1       Running   0          3m
 po/XXX-XXX-solace-2   0/1       Running   0          3m
-NAME                               STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS              AGE
+NAME                        STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS       AGE
 pvc/data-XXX-XXX-solace-0   Bound     pvc-74d9ceb3-d492-11e7-b95e-42010a800173   30Gi       RWO            XXX-XXX-standard   3m
 pvc/data-XXX-XXX-solace-1   Bound     pvc-74dce76f-d492-11e7-b95e-42010a800173   30Gi       RWO            XXX-XXX-standard   3m
 pvc/data-XXX-XXX-solace-2   Bound     pvc-74e12b36-d492-11e7-b95e-42010a800173   30Gi       RWO            XXX-XXX-standard   3m
-NAME                                          CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM                                  STORAGECLASS              REASON    AGE
+NAME                                          CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM                           STORAGECLASS       REASON    AGE
 pv/pvc-74d9ceb3-d492-11e7-b95e-42010a800173   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-0   XXX-XXX-standard             3m
 pv/pvc-74dce76f-d492-11e7-b95e-42010a800173   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-1   XXX-XXX-standard             3m
 pv/pvc-74e12b36-d492-11e7-b95e-42010a800173   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-2   XXX-XXX-standard             3m
@@ -181,7 +180,7 @@ External Traffic Policy:  Cluster
 
 <br>
 
-Note here serveral IPs and port. In this example 104.154.54.154 is the external Public IP to use. This can also be seen from the google cloud console:
+Note here several IPs and port. In this example 104.154.54.154 is the external Public IP to use. This can also be seen from the google cloud console:
 
 ![alt text](/images/google_container_loadbalancer.png "GKE Load Balancer")
 
@@ -194,9 +193,9 @@ It is possible to watch the VMR come up via logs in the Google Cloud Platform lo
 <br>
 <br>
 
-## Gaining Admin and ssh access to the VMR
+## Gaining admin and ssh access to the VMR
 
-The external management IP will be the Public IP associated with your GCE instance. It will go through the load balancer service as described above and will always point to the active VMR. The default port is 22 for CLI and 8080 for SolAdmin.
+The external management IP will be the Public IP associated with your GCE instance. Access will go through the load balancer service as described in the introduction and will always point to the active VMR. The default port is 22 for CLI and 8080 for SEMP/SolAdmin.
 
 See the [Solace Kubernetes Quickstart README](https://github.com/bczoma/solace-kubernetes-quickstart/tree/master##gaining-admin-access-to-the-vmr ) for more details including admin and ssh access to the individual VMRs.
 
