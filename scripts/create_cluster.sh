@@ -28,19 +28,22 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 # Initialize our own variables:
 cluster_name="solace-vmr-cluster"
 machine_type="n1-standard-4"
+image_type="UBUNTU"
 number_of_nodes="1"
-zone="us-central1-b"
+zones="us-central1-b"
 verbose=0
 
-while getopts "c:m:n:z:" opt; do
+while getopts "c:i:m:n:z:" opt; do
     case "$opt" in
     c)  cluster_name=$OPTARG
+        ;;
+    i)  image_type=$OPTARG
         ;;
     m)  machine_type=$OPTARG
         ;;
     n)  number_of_nodes=$OPTARG
         ;;
-    z)  zone=$OPTARG
+    z)  zones=$OPTARG
         ;;
     esac
 done
@@ -49,14 +52,24 @@ shift $((OPTIND-1))
 [ "$1" = "--" ] && shift
 
 verbose=1
-echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, number_of_nodes=${number_of_nodes} zone=${zone} ,Leftovers: $@"
+echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, image_type=${image_type}, number_of_nodes=${number_of_nodes}, zones=${zones} ,Leftovers: $@"
 
 echo "`date` INFO: INITIALIZE GCLOUD"
 echo "#############################################################"
 gcloud components install kubectl
-gcloud config set compute/zone ${zone}
+
+IFS=',' read -ra zone_array <<< "$zones"
+
+if [[ ! -z ${zone_array[2]} ]]; then
+  add_zones="${zone_array[1]},${zone_array[2]}"
+else
+  add_zones=""
+fi
+  
+
+gcloud config set compute/zone ${zone_array[0]}
 
 echo "`date` INFO: CREATE CLUSTER"
 echo "#############################################################"
-gcloud container clusters create ${cluster_name} --machine-type=${machine_type} --num-nodes=${number_of_nodes}
+gcloud container clusters create ${cluster_name} --machine-type=${machine_type} --image-type=${image_type} --additional-zones=${add_zones} --num-nodes=${number_of_nodes}
 gcloud container clusters get-credentials ${cluster_name}

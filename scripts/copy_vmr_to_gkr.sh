@@ -47,7 +47,7 @@ solace_directory=.
 echo "`date` INFO: RETRIEVE SOLACE DOCKER IMAGE"
 echo "#############################################################"
 echo "`date` INFO: check to make sure we have a complete load"
-wget -O ${solace_directory}/solos.info -nv  https://products.solace.com/download/VMR_DOCKER_COMM_MD5
+wget -O ${solace_directory}/solos.info -nv  https://products.solace.com/download/VMR_DOCKER_EVAL_MD5
 IFS=' ' read -ra SOLOS_INFO <<< `cat ${solace_directory}/solos.info`
 MD5_SUM=${SOLOS_INFO[0]}
 SolOS_LOAD=${SOLOS_INFO[1]}
@@ -88,6 +88,6 @@ echo "#################################"
 docker rmi gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}
 docker rmi ${imageId}
 
-export SOLACE_IMAGE=gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}
+export SOLACE_IMAGE_URL=gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}
 echo "`date` INFO: Record the image reference in the GCR you will need to for next steps"
-echo "SOLACE_IMAGE=gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}"
+echo "SOLACE_IMAGE_URL=gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}"
