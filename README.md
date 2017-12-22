@@ -66,7 +66,7 @@ chmod 755 copy_vmr_to_gkr.sh
 
 <br>
 
-* The script will end with a link required for next step.  You can view the new entry on the google container registry in the Cloud Platform Console.
+* The script will end with a link required for Step 5.  You can view the new entry on the google container registry in the Cloud Platform Console:
 
 ![alt text](/images/google_container_registry.png "Google Container Registry")
 
@@ -75,7 +75,7 @@ chmod 755 copy_vmr_to_gkr.sh
 
 **Step 4**: Use Google Cloud Shell to create GKE cluster of three nodes.
 
-* Download and execute the cluster create script in the Google Cloud Shell. All argument defaults would be ok if you want a single non-HA VMR. Specify `-n = 3` as number of nodes and a single `-z <zone>` for an HA Cluster in a single GCP zone. If you want the VMR cluster spread across 3 zones within a region (recommended for production), then specify the 3 zones as per the example below but leave the number of nodes at default 1 (meaning one node per zone):
+* Download and execute the cluster create script in the Google Cloud Shell. All argument defaults would be ok if you want a single non-HA VMR. Specify `-n = 3` as number of nodes per zone and a single `-z <zone>` for an HA Cluster in a single GCP zone. If you want the VMR cluster spread across 3 zones within a region (recommended for production), then specify the 3 zones as per the example below but leave the number of nodes per zone at default 1:
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/create_cluster.sh
@@ -87,7 +87,7 @@ This will create a GKE cluster of 3 nodes spread across 3 zones:
 
 ![alt text](/images/Nodes_across_zones.png "Google Container Engine nodes")
 
-Further GKE `create_cluster.sh` options:
+Here are some more GKE `create_cluster.sh` arguments:
 * The default cluster name is "solace-vmr-cluster", which can be changed by specifying the `-c <cluster name>` command line argument.
 * The default machine type is "n1-standard-4". To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine type>`. Note that the minimum CPU and memory requirements must be satisfied for the targeted VMR size, see the next step.
 
@@ -100,7 +100,7 @@ kubectl get services
 ```
 If this fails, you will need to [troubleshoot GKE](https://cloud.google.com/kubernetes-engine/docs/support ).
 
-Also note that during install of GKE and release Solace HA, several GCP resources such as GCE nodes, Disks, and Loadbalancers are created.  After deleting a Kubernetes release you should validate that all resources created are deleted.  The [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart(TODO) ) describes how to delete a release. If it is necessary to delete the GKE cluster refer to the [Google Cloud Platform documentation](https://cloud.google.com/sdk/gcloud/reference/container/clusters/delete ).
+Also note that during install of GKE and release Solace HA, several GCP resources such as GCE nodes, Disks, and Loadbalancers are created.  After deleting a Kubernetes release you should validate that all resources created are deleted.  The [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart(https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#deleting-a-deployment) ) describes how to delete a _release_. If it is necessary to delete the GKE _cluster_ refer to the [Google Cloud Platform documentation](https://cloud.google.com/sdk/gcloud/reference/container/clusters/delete ).
 
 <br>
 <br>
@@ -119,7 +119,7 @@ chmod 755 start_vmr.sh
 
 In current configuration above script has created and started a small-size HA VMR deployment with a provisioned PersistentVolume (PV) storage.
 
-For other deployment configuration options refer to the [Solace Kubernetes Quickstart README](https://github.com/bczoma/solace-kubernetes-quickstart/tree/master#using-other-vmr-deployment-configurations ).
+For other deployment configuration options refer to the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#using-other-vmr-deployment-configurations ).
 
 ### Validate the Deployment
 
@@ -197,13 +197,13 @@ It is possible to watch the VMR come up via logs in the Google Cloud Platform lo
 
 The external management IP will be the Public IP associated with your GCE instance. Access will go through the load balancer service as described in the introduction and will always point to the active VMR. The default port is 22 for CLI and 8080 for SEMP/SolAdmin.
 
-See the [Solace Kubernetes Quickstart README](https://github.com/bczoma/solace-kubernetes-quickstart/tree/master##gaining-admin-access-to-the-vmr ) for more details including admin and ssh access to the individual VMRs.
+See the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#gaining-admin-access-to-the-vmr ) for more details including admin and ssh access to the individual VMRs.
 
 ## Testing Data access to the VMR
 
 To test data traffic though the newly created VMR instance, visit the Solace developer portal and select your preferred programming language to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/ ). Under each language there is a Publish/Subscribe tutorial that will help you get started.
 
-Note: the Host will be the Public IP. It may be necessary to [open up external access to a port](TODO) used by the particular messaging API if it is not already exposed.
+Note: the Host will be the Public IP. It may be necessary to [open up external access to a port](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#upgradingmodifying-the-vmr-cluster) used by the particular messaging API if it is not already exposed.
 
 ![alt text](/images/solace_tutorial.png "getting started publish/subscribe")
 
