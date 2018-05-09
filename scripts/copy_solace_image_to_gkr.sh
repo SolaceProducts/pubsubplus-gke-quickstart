@@ -45,7 +45,7 @@ echo "`date` INFO: solace_url=$solace_url ,Leftovers: $@"
 solace_directory=.
 
 echo "`date` INFO: RETRIEVE SOLACE DOCKER IMAGE"
-echo "#############################################################"
+echo "###############################################################"
 wget -q -O solace-redirect ${solace_url}
 if [[ ${solace_url} == *"em.solace.com"* ]]; then
     REAL_LINK=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=%]*" ${solace_directory}/solace-redirect`
@@ -77,8 +77,8 @@ else
     echo "`date` INFO: Successfully downloaded ${SolOS_LOAD}"
 fi
 
-echo "`date` INFO: LOAD DOCKER IMAGE INTO LOCALLY"
-echo "##################################################################"
+echo "`date` INFO: LOAD DOCKER IMAGE INTO LOCAL REGISTRY"
+echo "########################################################################"
 if [ `docker images "solace-*" -q` ] ; then docker rmi -f `docker images "solace-*" -q`; fi;
 docker load -i ${solace_directory}/${SolOS_LOAD}
 
@@ -90,13 +90,13 @@ tag=`echo $local_repo | awk '{print$2}'`
 imageId=`echo $local_repo | awk '{print$3}'`
 
 echo "`date` INFO: PUSH SOLACE VMR INSTANCE INTO GOOGLE CONTAINER REGISTRY"
-echo "####################################################################################"
+echo "##########################################################################################"
 if [ -z ${DEVSHELL_PROJECT_ID} ]; then DEVSHELL_PROJECT_ID=`gcloud projects list | awk 'FNR>1 {print$1}'`; fi
 docker tag ${imageId} gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}
 gcloud docker -- push gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}
 
-echo "`date` INFO: Cleanup"
-echo "#################################"
+echo "`date` INFO: CLEANUP"
+echo "##########################################"
 
 docker rmi gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}
 docker rmi ${imageId}
