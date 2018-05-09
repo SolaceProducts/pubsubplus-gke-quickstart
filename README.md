@@ -1,37 +1,37 @@
-# Install Solace Message Router HA deployment onto a Google Kubernetes Engine (gke), cluster
+# Deploying a Solace PubSub+ Software Message Broker HA group onto a Google Kubernetes Engine (gke) cluster
 
 ## Purpose of this repository
 
-This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to provide a concrete example of how to deploy redundant Solace VMRs in HA configuration on Google Kubernetes Engine on a 3 node GKE cluster across 3 zones.  If you are looking for a simple way to install a single Solace message router into GCP, please see [Solace GCP Quickstart](https://github.com/SolaceLabs/solace-gcp-quickstart).
+This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to show you how to deploy Solace PubSub+ software message brokers in an HA configuration on a 3 node Google Kubernetes Engine (GKE) cluster spread across 3 zones.
 
 ![alt text](/images/network_diagram.png "Network Diagram")
 
-- Purple        - Data – Client data including active node mgmt.
+- Purple        - Data – Client data including active node management.
 - Blue          - DNS  – HA node discovery.
 - Black         - Disk – Persistent disk mount.
 - Orange/Yellow - Mgmt – Direct CLI/SEMP.
 
-## Description of Solace VMR
+## Description of Solace PubSub+ Software Message Broker
 
-Solace Virtual Message Router (VMR) software provides enterprise-grade messaging capabilities so you can easily enable event-driven communications between applications, IoT devices, microservices and mobile devices across hybrid cloud and multi cloud environments. The Solace VMR supports open APIs and standard protocols including AMQP 1.0, JMS, MQTT, REST and WebSocket, along with all message exchange patterns including publish/subscribe, request/reply, fan-in/fan-out, queueing, streaming and more. The Solace VMR can be deployed in all popular public cloud, private cloud and on-prem environments, and offers both feature parity and interoperability with Solace’s proven hardware appliances and Messaging as a Service offering called Solace Cloud.
+The Solace PubSub+ software message broker meets the needs of big data, cloud migration, and Internet-of-Things initiatives, and enables microservices and event-driven architecture. Capabilities include topic-based publish/subscribe, request/reply, message queues/queueing, and data streaming for IoT devices and mobile/web apps. The message broker supports open APIs and standard protocols including AMQP, JMS, MQTT, REST, and WebSocket. As well, it can be deployed in on-premise datacenters, natively within private and public clouds, and across complex hybrid cloud environments.
 
-## How to Deploy a VMR onto GKE
+## How to Deploy a Solace PubSub+ Software Message Broker onto GKE
 
 This is a 5 step process:
 
 [//]:# (Section 1 prereq is direct copy from here:  https://cloud.google.com/container-registry/docs/quickstart)
 
-**Step 1**: Create a project in Google Cloud Platform and enable prerequisites:
+**Step 1**: Create a project in Google Cloud Platform and enable these prerequisites:
 
-* In the Cloud Platform Console, go to the Manage resources page and select or create a new project.
+* In the Cloud Platform Console, go to the Manage Resources page and select or create a new project.
 
     [GO TO THE MANAGE RESOURCES PAGE](https://console.cloud.google.com/projectselector/iam-admin/projects)
 
-* Enable billing for your project. Follow the guide from the below link.
+* Enable billing for your project by following this link.
 
     [ENABLE BILLING](https://support.google.com/cloud/answer/6293499#enable-billing)
 
-* Enable the Container Registry API.  Follow the below link and select the project you created from above.
+* Enable the Container Registry API by following this link and selecting the project you created above.
 
     [ENABLE THE API](https://console.cloud.google.com/flows/enableapi?apiid=containerregistry.googleapis.com)
 
@@ -39,43 +39,47 @@ This is a 5 step process:
 <br>
 <br>
 
-**Step 2**: Use the button below to go to the Solace Developer portal and request a Solace Evaluation edition VMR. This process will return an email with a Download link. In the email do a right click "Copy Hyperlink" on the "Download the VMR Evaluation Edition for Docker" hyperlink. This link is of the form "http<nolink>://em.solace.com/" and will be needed in the following section.
+**Step 2**: Go to the Solace Developer Portal and request a Solace PubSub+ software message broker. This process will return an email with a Download link. To get going, right click "Copy Hyperlink" on the "Download the Solace PubSub+ Software Message Broker for Docker" hyperlink. This will be needed in the following section.
 
-Note: The Evaluation edition VMR is required to support HA deployment.
+You can use this quick start with either PubSub+ `Standard` or PubSub+ `Enterprise Evaluation Edition`.
 
-<a href="http://dev.solace.com/downloads/download-vmr-evaluation-edition-docker" target="_blank">
-    <img src="/images/register.png"/>
-</a>
+| PubSub+ Standard | PubSub+ Enterprise Evaluation Edition
+| :---: | :---: |
+| Free, up to 1k simultaneous connections,<br/>up to 100k messages per second | 90-day trial version, unlimited |
+| <a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank"><img src="images/register.png"/></a> | <a href="http://dev.solace.com/downloads/download-vmr-evaluation-edition-docker/" target="_blank"><img src="images/register.png"/></a> |
+ 
+<br>
+<br>
+ 
+**Step 3**: Place the message broker in Google Container Registry, using a script:
 
-**Step 3**: Place Solace VMR in Google Container Registry:
-
-* Open a Google Cloud Shell from the Cloud Platform Console used to create the project, like this:
+* The script can be executed from a Google Cloud SDK Shell or open a Google Cloud Shell from the Cloud Platform Console:
 
 ![alt text](/images/launch_google_cloud_shell.png "Google Cloud Shell")
 
 <br>
 <br>
 
-* In the Cloud Shell paste the following, (replace http<nolink>://em.solace.com/ with the link received in email from step 2.)
+* In the Cloud Shell paste the following, (replace `http<nolink>://em.solace.com/...` with the link you received by email from step 2.). As an alternative to using the download link you can also use load versions hosted remotely (if so, a .md5 file needs to be created in the same remote directory).
 
 ```sh
-wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/copy_vmr_to_gkr.sh
-chmod 755 copy_vmr_to_gkr.sh
-./copy_vmr_to_gkr.sh -u http://em.solace.com/
+wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/copy_solace_image_to_gkr.sh
+chmod 755 copy_solace_image_to_gkr.sh
+./copy_solace_image_to_gkr.sh -u http://em.solace.com/...
 ```
 
 <br>
 
-* The script will end with a link required for Step 5.  You can view the new entry on the google container registry in the Cloud Platform Console:
+* The script will end with exporting and showing a `SOLACE_IMAGE_URL` link required for Step 5.  You can view the new entry on the Google Container Registry in the Cloud Platform Console:
 
 ![alt text](/images/google_container_registry.png "Google Container Registry")
 
 <br>
 <br>
 
-**Step 4**: Use Google Cloud Shell to create GKE cluster of three nodes.
+**Step 4**: Use Google Cloud Shell to create the three node GKE cluster.
 
-* Download and execute the cluster create script in the Google Cloud Shell. All argument defaults would be ok if you want a single non-HA VMR. Specify `-n = 3` as number of nodes per zone and a single `-z <zone>` for an HA Cluster in a single GCP zone. If you want the VMR cluster spread across 3 zones within a region (recommended for production), then specify the 3 zones as per the example below but leave the number of nodes per zone at default 1:
+* Download and execute the cluster creation script in the Google Cloud Shell. It would be alright to accept the default values for all the script's arguments if you were setting up and running a single message broker; however, some need to be changed to support the 3 node HA cluster. If you want to run the HA cluster in a single GCP zone, specify `-n = 3` as the number of nodes per zone and a single `-z <zone>`. If you want the HA cluster spread across 3 zones within a region - which is the configuration recommended for production situations - specify the 3 zones as per the example below, but leave the number of nodes per zone at the default value of 1.
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/create_cluster.sh
@@ -87,39 +91,53 @@ This will create a GKE cluster of 3 nodes spread across 3 zones:
 
 ![alt text](/images/Nodes_across_zones.png "Google Container Engine nodes")
 
-Here are some more GKE `create_cluster.sh` arguments:
-* The default cluster name is "solace-vmr-cluster", which can be changed by specifying the `-c <cluster name>` command line argument.
-* The default machine type is "n1-standard-4". To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine type>`. Note that the minimum CPU and memory requirements must be satisfied for the targeted VMR size, see the next step.
+Here are two more GKE `create_cluster.sh` arguments you may need to consider changing for your deployment:
+* solace-message-broker-cluster: The default cluster name, which can be changed by specifying the `-c <cluster name>` command line argument.
+* n1-standard-4: The default machine type. To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine type>`. Note that the minimum CPU and memory requirements must be satisfied for the targeted message broker size, see the next step.
 
 <br>
 
-You can check that the Kubernetes deployment on GKE is healthy with the following command, which should return a single line with svc/kubernetes:
+You can check that the Kubernetes deployment on GKE is healthy with the following command (which should return a single line with svc/kubernetes):
 
 ```sh
 kubectl get services
 ```
 If this fails, you will need to [troubleshoot GKE](https://cloud.google.com/kubernetes-engine/docs/support ).
 
-Also note that during install of GKE and release Solace HA, several GCP resources such as GCE nodes, Disks, and Loadbalancers are created.  After deleting a Kubernetes release you should validate that all resources created are deleted.  The [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart(https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#deleting-a-deployment) ) describes how to delete a _release_. If it is necessary to delete the GKE _cluster_ refer to the [Google Cloud Platform documentation](https://cloud.google.com/sdk/gcloud/reference/container/clusters/delete ).
+Also note that during installation of GKE and release Solace HA, several GCP resources, such as GCE nodes, disks and load balancers, are created.  After deleting a Kubernetes release you should validate that all its resources are also deleted.  The [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart(https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#deleting-a-deployment) ) describes how to delete a release. If it's necessary to delete the GKE cluster refer to the [Google Cloud Platform documentation](https://cloud.google.com/sdk/gcloud/reference/container/clusters/delete ).
 
 <br>
 <br>
 
-**Step 5**: Use Google Cloud Shell to deploy Pod and Service to that cluster.  This will finish with a Solace VMR HA configuration deployed to GKE.
+**Step 5**: Use Google Cloud Shell to deploy Solace message broker Pods and Service to that cluster.  This will finish with a message broker HA configuration deployed to GKE.
 
-* Download and execute the cluster create and deployment script in the Google Cloud Shell.  Replace `<YourAdminPassword>` with the desired password for the management `admin` user. Replace `<releaseTag>` with the release tag of the image in the container registry.
+* Download the configuration script in the Google Cloud Shell.
 
 ```sh
-wget https://raw.githubusercontent.com/SolaceProducts/solace-kubernetes-quickstart/master/scripts/start_vmr.sh
-chmod 755 start_vmr.sh
-./start_vmr.sh -p <YourAdminPassword> -i gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:<releaseTag> -v values-examples/small-persist-ha-provisionPvc.yaml
+wget https://raw.githubusercontent.com/SolaceProducts/solace-kubernetes-quickstart/master/scripts/configure.sh
+chmod 755 configure.sh
 ```
 
-#### Using other VMR deployment configurations
+* For the following variables, substitute `<YourAdminPassword>` with the desired password for the management `admin` user. Use the exported `SOLACE_IMAGE_URL` from step 3 or substitute `<DockerRepo>`, `<ImageName>` and `<releaseTag>` according to your image in the container registry. Substitute `<YourCloudProvider>` with `gcp` because you are deploying to Google Cloud Platform.
 
-In current configuration above script has created and started a small-size HA VMR deployment with a provisioned PersistentVolume (PV) storage.
+```sh
+  PASSWORD=<YourAdminPassword>
+  SOLACE_IMAGE_URL=<DockerRepo>.<ImageName>:<releaseTag>  # no need to change if used the script in step 3
+  CLOUD_PROVIDER=gcp
+```
 
-For other deployment configuration options refer to the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#using-other-vmr-deployment-configurations ).
+* Execute the configuration script, which will install the required version of the `helm` tool then download and prepare the `solace` helm chart. It will be ready for creating a `production` HA message broker deployment, with up to 1000 connections, using a provisioned PersistentVolume (PV) storage. For other deployment configuration options refer to the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#using-other-vmr-deployment-configurations ).
+
+```sh
+./configure.sh -c ${CLOUD_PROVIDER} -p ${PASSWORD} -i ${SOLACE_IMAGE_URL} -v values-examples/prod1k-persist-ha-provisionPvc.yaml
+```
+
+* Finally, use `helm` to install the deployment from the `solace` chart location. For more information about how `helm` is used, refer to the [Solace Kubernetes Quickstart README](https://github.com/SolaceDev/solace-kubernetes-quickstart/tree/master#step-5).
+
+```sh
+cd solace-kubernetes-quickstart/solace
+../../helm/helm install . -f values.yaml
+```
 
 ### Validate the Deployment
 
@@ -180,30 +198,30 @@ External Traffic Policy:  Cluster
 
 <br>
 
-Note here several IPs and port. In this example 104.154.54.154 is the external Public IP to use. This can also be seen from the google cloud console:
+Note here that there are several IPs and ports. In this example 104.154.54.154 is the external Public IP to use. This can also be seen from the Google Cloud Console:
 
 ![alt text](/images/google_container_loadbalancer.png "GKE Load Balancer")
 
 ### Viewing bringup logs
 
-It is possible to watch the VMR come up via logs in the Google Cloud Platform log stack.  Inside Logging look for GKE Container, solace-vmr-cluster.  In the example below the Solace admin password was not set, therefore the container would not come up and exited.
+It is possible to watch the message broker come up via logs in the Google Cloud Platform log stack.  Inside Logging look for the GKE Container called solace-message-broker-cluster.  In the example below the Solace admin password was not set, therefore the container would not come up and exited.
 
 ![alt text](/images/gke_log_stack.png "GKE Log Stack")
 
 <br>
 <br>
 
-## Gaining admin and ssh access to the VMR
+## Gaining admin and ssh access to the message broker
 
-The external management IP will be the Public IP associated with your GCE instance. Access will go through the load balancer service as described in the introduction and will always point to the active VMR. The default port is 22 for CLI and 8080 for SEMP/SolAdmin.
+The external management IP will be the Public IP associated with your GCE instance. Access will go through the load balancer service as described in the introduction and will always point to the active message broker. The default port is 22 for CLI and 8080 for SEMP/SolAdmin.
 
-See the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#gaining-admin-access-to-the-vmr ) for more details including admin and ssh access to the individual VMRs.
+See the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#gaining-admin-access-to-the-vmr ) for more details including admin and ssh access to the individual message brokers.
 
-## Testing Data access to the VMR
+## Testing Data access to the message broker
 
-To test data traffic though the newly created VMR instance, visit the Solace developer portal and select your preferred programming language to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/ ). Under each language there is a Publish/Subscribe tutorial that will help you get started.
+To test data traffic though the newly created message broker instance, visit the Solace Developer Portal and select your preferred programming language to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/ ). Under each language there is a Publish/Subscribe tutorial that will help you get started.
 
-Note: the Host will be the Public IP. It may be necessary to [open up external access to a port](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#upgradingmodifying-the-vmr-cluster) used by the particular messaging API if it is not already exposed.
+Note: The Host will be the Public IP. It may be necessary to [open up external access to a port](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#upgradingmodifying-the-vmr-cluster) used by the particular messaging API if it is not already exposed.
 
 ![alt text](/images/solace_tutorial.png "getting started publish/subscribe")
 

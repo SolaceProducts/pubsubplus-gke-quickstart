@@ -56,8 +56,6 @@ echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, i
 
 echo "`date` INFO: INITIALIZE GCLOUD"
 echo "#############################################################"
-gcloud components install kubectl
-
 IFS=',' read -ra zone_array <<< "$zones"
 
 if [[ ! -z ${zone_array[2]} ]]; then

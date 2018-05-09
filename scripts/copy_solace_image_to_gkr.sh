@@ -46,31 +46,43 @@ solace_directory=.
 
 echo "`date` INFO: RETRIEVE SOLACE DOCKER IMAGE"
 echo "#############################################################"
-echo "`date` INFO: check to make sure we have a complete load"
-wget -O ${solace_directory}/solos.info -nv  https://products.solace.com/download/VMR_DOCKER_EVAL_MD5
+wget -q -O solace-redirect ${solace_url}
+if [[ ${solace_url} == *"em.solace.com"* ]]; then
+    REAL_LINK=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=%]*" ${solace_directory}/solace-redirect`
+    LOAD_NAME="`echo $REAL_LINK | awk -v FS="(download/|?)" '{print $2}'`"
+    # a redirect link provided by solace
+    wget -O ${solace_directory}/solos.info -nv  https://products.solace.com/download/${LOAD_NAME}_MD5
+else
+    REAL_LINK=${solace_url}
+    # an already-existing load (plus its md5 file) hosted somewhere else (e.g. in an s3 bucket)
+    wget -O ${solace_directory}/solos.info -nv  ${solace_url}.md5
+fi
+
 IFS=' ' read -ra SOLOS_INFO <<< `cat ${solace_directory}/solos.info`
 MD5_SUM=${SOLOS_INFO[0]}
 SolOS_LOAD=${SOLOS_INFO[1]}
 echo "`date` INFO: Reference md5sum is: ${MD5_SUM}"
-
-wget -q -O solace-redirect ${solace_url}
-REAL_LINK=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" ${solace_directory}/solace-redirect`
 wget -q -O  ${solace_directory}/${SolOS_LOAD} ${REAL_LINK}
 cd ${solace_directory}
+
+
+echo "`date` INFO: check to make sure we have a complete load"
 LOCAL_OS_INFO=`md5sum ${SolOS_LOAD}`
 IFS=' ' read -ra SOLOS_INFO <<< ${LOCAL_OS_INFO}
 LOCAL_MD5_SUM=${SOLOS_INFO[0]}
 if [ ${LOCAL_MD5_SUM} != ${MD5_SUM} ]; then
     echo "`date` WARN: Possible corrupt SolOS load, md5sum do not match"
+    exit 1
 else
     echo "`date` INFO: Successfully downloaded ${SolOS_LOAD}"
 fi
 
 echo "`date` INFO: LOAD DOCKER IMAGE INTO LOCALLY"
 echo "##################################################################"
+if [ `docker images "solace-*" -q` ] ; then docker rmi -f `docker images "solace-*" -q`; fi;
 docker load -i ${solace_directory}/${SolOS_LOAD}
 
-local_repo=`docker images solace-app | grep solace-app`
+local_repo=`docker images | grep solace`
 echo "`date` INFO: Current docker images are:"
 echo ${local_repo}
 
