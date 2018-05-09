@@ -91,6 +91,7 @@ imageId=`echo $local_repo | awk '{print$3}'`
 
 echo "`date` INFO: PUSH SOLACE VMR INSTANCE INTO GOOGLE CONTAINER REGISTRY"
 echo "####################################################################################"
+if [ -z ${DEVSHELL_PROJECT_ID} ]; then DEVSHELL_PROJECT_ID=`gcloud projects list | awk 'FNR>1 {print$1}'`; fi
 docker tag ${imageId} gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}
 gcloud docker -- push gcr.io/${DEVSHELL_PROJECT_ID}/solos-vmr:${tag}
 
