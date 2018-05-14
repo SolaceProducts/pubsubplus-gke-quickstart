@@ -62,7 +62,7 @@ IFS=' ' read -ra SOLOS_INFO <<< `cat ${solace_directory}/solos.info`
 MD5_SUM=${SOLOS_INFO[0]}
 SolOS_LOAD=${SOLOS_INFO[1]}
 if [ -z ${MD5_SUM} ]; then
-  echo "`date` ERROR: Missing md5sum for the Solace load" | tee /dev/stderr | tee /dev/stderr
+  echo "`date` ERROR: Missing md5sum for the Solace load" | tee /dev/stderr
   exit 1
 fi
 echo "`date` INFO: Reference md5sum is: ${MD5_SUM}"
@@ -82,7 +82,10 @@ fi
 
 echo "`date` INFO: LOAD DOCKER IMAGE INTO LOCAL REGISTRY"
 echo "########################################################################"
-if [ `docker images "solace-*" -q` ] ; then docker rmi -f `docker images "solace-*" -q`; fi;
+if [ "`docker images "solace-*" -q`" ] ; then
+  echo "`date` INFO: Removing existing images first..."
+  docker rmi -f `docker images "solace-*" -q`
+fi
 docker load -i ${solace_directory}/${SolOS_LOAD}
 
 local_repo=`docker images "solace-*" | grep solace`
@@ -95,7 +98,14 @@ imageId=`echo $local_repo | awk '{print$3}'`
 
 echo "`date` INFO: PUSH SOLACE VMR INSTANCE INTO GOOGLE CONTAINER REGISTRY"
 echo "##########################################################################################"
-if [ -z ${DEVSHELL_PROJECT_ID} ]; then DEVSHELL_PROJECT_ID=`gcloud projects list | awk 'FNR>1 {print$1}'`; fi
+if [ -z "${DEVSHELL_PROJECT_ID}" ]; then
+  DEVSHELL_PROJECT_ID=`gcloud projects list | awk 'FNR>1 {print$1}'`
+  if [ "`gcloud projects list | awk 'END{print NR}'`" -gt "2" ]; then 
+    echo "Detected following multiple GCP projects. Please run 'export DEVSHELL_PROJECT_ID=' set to the correct one and then rerun this script!" | tee /dev/stderr
+    echo "`gcloud projects list | awk '{print$1}'`"
+    exit 1
+  fi
+fi
 docker tag ${imageId} gcr.io/${DEVSHELL_PROJECT_ID}/${repoName}:${tag}
 gcloud docker -- push gcr.io/${DEVSHELL_PROJECT_ID}/${repoName}:${tag}
 

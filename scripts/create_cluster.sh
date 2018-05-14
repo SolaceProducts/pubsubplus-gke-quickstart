@@ -16,11 +16,7 @@
 # limitations under the License.
 
 # The purpose of this script is to:
-#  - take a URL to a Solace VMR docker container
-#  - validate the container against known MD5
-#  - load the container to create a local instance
-#  - upload the instance into google container registery
-#  - clean up load docker
+#  - create a GCP cluster to host a Solace PubSub+ message broker deployment
 
 
 OPTIND=1         # Reset in case getopts has been used previously in the shell.

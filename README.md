@@ -45,7 +45,7 @@ You can use this quick start with either PubSub+ `Standard` or PubSub+ `Enterpri
 
 | PubSub+ Standard | PubSub+ Enterprise Evaluation Edition
 | :---: | :---: |
-| Free, up to 1k simultaneous connections,<br/>up to 100k messages per second | 90-day trial version, unlimited |
+| Free, up to 1k simultaneous connections,<br/>up to 10k messages per second | 90-day trial version, unlimited |
 | <a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank"><img src="images/register.png"/></a> | <a href="http://dev.solace.com/downloads/download-vmr-evaluation-edition-docker/" target="_blank"><img src="images/register.png"/></a> |
  
 <br>
@@ -53,7 +53,14 @@ You can use this quick start with either PubSub+ `Standard` or PubSub+ `Enterpri
  
 **Step 3**: Place the message broker in Google Container Registry, using a script:
 
-* The script can be executed from a Google Cloud SDK Shell or open a Google Cloud Shell from the Cloud Platform Console:
+* The script can be executed from an installed Google Cloud SDK Shell or open a Google Cloud Shell from the Cloud Platform Console.
+
+   * If using Google Cloud SDK Shell, also setup following dependencies:
+      * docker, gcloud and kubectl installed
+      * use `gcloud init` to setup account locally
+      * proper Google Cloud permissions have been set: `container.clusterRoleBindings.create` permission is required
+
+   * If using the Cloud Shell from the Cloud Platform Console, it can be started in the browser from the red underlined icon in the upper right:
 
 ![alt text](/images/launch_google_cloud_shell.png "Google Cloud Shell")
 
@@ -146,49 +153,54 @@ Now you can validate your deployment in the Google Cloud Shell:
 ```sh
 prompt:~$ kubectl get statefulsets,services,pods,pvc,pv
 NAME                          DESIRED   CURRENT   AGE
-statefulsets/XXX-XXX-solace   3         3         3m
+statefulsets/XXX-XXX-solace   3         3         4d
+
 NAME                           TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                                       AGE
-svc/XXX-XXX-solace             LoadBalancer   10.15.249.186   104.154.54.154   22:32656/TCP,8080:32394/TCP,55555:31766/TCP   3m
-svc/XXX-XXX-solace-discovery   ClusterIP      None            <none>           8080/TCP                                      3m
-svc/kubernetes                 ClusterIP      10.15.240.1     <none>           443/TCP                                       6d
+svc/XXX-XXX-solace             LoadBalancer   10.19.242.217   107.178.210.65   22:30238/TCP,8080:31684/TCP,55555:32120/TCP   4d
+svc/XXX-XXX-solace-discovery   ClusterIP      None            <none>           8080/TCP                                      4d
+svc/kubernetes                 ClusterIP      10.19.240.1     <none>           443/TCP                                       4d
+
 NAME                  READY     STATUS    RESTARTS   AGE
-po/XXX-XXX-solace-0   1/1       Running   0          3m
-po/XXX-XXX-solace-1   0/1       Running   0          3m
-po/XXX-XXX-solace-2   0/1       Running   0          3m
-NAME                        STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS       AGE
-pvc/data-XXX-XXX-solace-0   Bound     pvc-74d9ceb3-d492-11e7-b95e-42010a800173   30Gi       RWO            XXX-XXX-standard   3m
-pvc/data-XXX-XXX-solace-1   Bound     pvc-74dce76f-d492-11e7-b95e-42010a800173   30Gi       RWO            XXX-XXX-standard   3m
-pvc/data-XXX-XXX-solace-2   Bound     pvc-74e12b36-d492-11e7-b95e-42010a800173   30Gi       RWO            XXX-XXX-standard   3m
+po/XXX-XXX-solace-0   1/1       Running   0          4d
+po/XXX-XXX-solace-1   1/1       Running   0          4d
+po/XXX-XXX-solace-2   1/1       Running   0          4d
+
+NAME                        STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS            AGE
+pvc/data-XXX-XXX-solace-0   Bound     pvc-47e3bd45-53ce-11e8-bda4-42010a800031   30Gi       RWO            XXX-XXX-standard   4d
+pvc/data-XXX-XXX-solace-1   Bound     pvc-47e826a0-53ce-11e8-bda4-42010a800031   30Gi       RWO            XXX-XXX-standard   4d
+pvc/data-XXX-XXX-solace-2   Bound     pvc-47ef4d7c-53ce-11e8-bda4-42010a800031   30Gi       RWO            XXX-XXX-standard   4d
+
 NAME                                          CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM                           STORAGECLASS       REASON    AGE
-pv/pvc-74d9ceb3-d492-11e7-b95e-42010a800173   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-0   XXX-XXX-standard             3m
-pv/pvc-74dce76f-d492-11e7-b95e-42010a800173   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-1   XXX-XXX-standard             3m
-pv/pvc-74e12b36-d492-11e7-b95e-42010a800173   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-2   XXX-XXX-standard             3m
+pv/pvc-47e3bd45-53ce-11e8-bda4-42010a800031   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-0   XXX-XXX-standard             4d
+pv/pvc-47e826a0-53ce-11e8-bda4-42010a800031   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-1   XXX-XXX-standard             4d
+pv/pvc-47ef4d7c-53ce-11e8-bda4-42010a800031   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-2   XXX-XXX-standard             4d
 
 
-prompt:~$ kubectl describe service XXX-XX-solace
-Name:                     XXX-XX-solace
+
+$ kubectl describe service XXX-XXX-solace
+Name:                     XXX-XXX-solace
 Namespace:                default
 Labels:                   app=solace
-                          chart=solace-0.1.0
+                          chart=solace-0.3.0
                           heritage=Tiller
-                          release=XXX-XX
+                          release=XXX-XXX
 Annotations:              <none>
-Selector:                 app=solace,release=XXX-XXX
+Selector:                 active=true,app=solace,release=XXX-XXX
 Type:                     LoadBalancer
-IP:                       10.15.249.186
-LoadBalancer Ingress:     104.154.54.154
+IP:                       10.19.242.217
+LoadBalancer Ingress:     107.178.210.65
 Port:                     ssh  22/TCP
 TargetPort:               22/TCP
-NodePort:                 ssh  32656/TCP
-Endpoints:                10.12.7.6:22
+NodePort:                 ssh  30238/TCP
+Endpoints:                10.16.0.10:22
 Port:                     semp  8080/TCP
 TargetPort:               8080/TCP
-NodePort:                 semp  32394/TCP
-Endpoints:                10.12.7.6:8080
+NodePort:                 semp  31684/TCP
+Endpoints:                10.16.0.10:8080
 Port:                     smf  55555/TCP
 TargetPort:               55555/TCP
-NodePort:                 smf  31766/TCP
-Endpoints:                10.12.7.6:55555
+NodePort:                 smf  32120/TCP
+Endpoints:                10.16.0.10:55555
 Session Affinity:         None
 External Traffic Policy:  Cluster
 :
@@ -198,7 +210,7 @@ External Traffic Policy:  Cluster
 
 <br>
 
-Note here that there are several IPs and ports. In this example 104.154.54.154 is the external Public IP to use. This can also be seen from the Google Cloud Console:
+Note here that there are several IPs and ports. In this example `107.178.210.65` is the external Public IP to use, indicated as "LoadBalancer Ingress". This can also be seen from the Google Cloud Console:
 
 ![alt text](/images/google_container_loadbalancer.png "GKE Load Balancer")
 
