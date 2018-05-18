@@ -1,0 +1,50 @@
+language: ruby
+
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - echo "Installing test gems"
+  - gem install yaml-lint
+  - export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+  - echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+  - curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+  - sudo apt-get update && sudo apt-get install google-cloud-sdk
+  - sudo apt-get install kubectl
+  - sudo apt-get install jq
+  - echo $GCP_KEY_FILE | base64 -d > ./keyfile
+  - gcloud auth activate-service-account -q $(jq -r .client_email keyfile) --key-file=./keyfile --project  $(jq -r .project_id keyfile)
+  - rm ./keyfile
+  
+install: true
+
+script:
+  - echo "Testing solace image to gkr"
+  - cd scripts
+  - chmod 755 copy_solace_image_to_gkr.sh
+  - ./copy_solace_image_to_gkr.sh -u $SOLACE_STANDARD_DOCKER_URL_PARAMETER_VALUE | tee results
+  - export `grep SOLACE_IMAGE_URL results`
+  - export STANDARD_IMAGE_URL=$SOLACE_IMAGE_URL
+  - ./copy_solace_image_to_gkr.sh -u $SOLACE_EVAL_DOCKER_URL_PARAMETER_VALUE | tee results
+  - export `grep SOLACE_IMAGE_URL results`
+  - export EVAL_IMAGE_URL=$SOLACE_IMAGE_URL
+  - echo "Testing cluster create script"
+  - chmod 755 create_cluster.sh
+  - export TESTCLUSTERNAME="sol-gke-travistest-$(date +%s)"
+  - ./create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f -c $TESTCLUSTERNAME -m g1-small
+  - kubectl get statefulset,svc,pods,pvc,pv
+ 
+
+after_success:
+  - echo "Test Success - Branch($TRAVIS_BRANCH) Pull Request($TRAVIS_PULL_REQUEST) Tag($TRAVIS_TAG)"
+  - echo "YAML linted"
+  - echo "GKE cluster deployment tested"
+  - echo "Messaging tested"
+
+after_script:
+  - gcloud container images delete $STANDARD_IMAGE_URL --quiet
+  - gcloud container images delete $EVAL_IMAGE_URL --quiet
+  - gcloud container clusters delete $TESTCLUSTERNAME --quiet --zone us-central1-b
+  - gcloud compute disks list | grep travis | sed 1d $rpt | while read -r a b c; do gcloud compute disks delete $a --zone $b --quiet; done

@@ -77,7 +77,7 @@ chmod 755 copy_solace_image_to_gkr.sh
 
 <br>
 
-* The script will end with exporting and showing a `SOLACE_IMAGE_URL` link required for Step 5.  You can view the new entry on the Google Container Registry in the Cloud Platform Console:
+* The script will end with showing a `SOLACE_IMAGE_URL` link required for Step 5.  You can view the new entry on the Google Container Registry in the Cloud Platform Console:
 
 ![alt text](/images/google_container_registry.png "Google Container Registry")
 
@@ -125,7 +125,7 @@ wget https://raw.githubusercontent.com/SolaceProducts/solace-kubernetes-quicksta
 chmod 755 configure.sh
 ```
 
-* For the following variables, substitute `<YourAdminPassword>` with the desired password for the management `admin` user. Use the exported `SOLACE_IMAGE_URL` from step 3 or substitute `<DockerRepo>`, `<ImageName>` and `<releaseTag>` according to your image in the container registry. Substitute `<YourCloudProvider>` with `gcp` because you are deploying to Google Cloud Platform.
+* For the following variables, substitute `<YourAdminPassword>` with the desired password for the management `admin` user. Use the `SOLACE_IMAGE_URL` result from step 3 or substitute `<DockerRepo>`, `<ImageName>` and `<releaseTag>` according to your image in the container registry. Substitute `<YourCloudProvider>` with `gcp` because you are deploying to Google Cloud Platform.
 
 ```sh
   PASSWORD=<YourAdminPassword>
