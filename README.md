@@ -2,7 +2,7 @@
 
 ## Purpose of this repository
 
-This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart) to show you how to deploy Solace PubSub+ software message brokers in an HA configuration on a 3 node Google Kubernetes Engine (GKE) cluster spread across 3 zones.
+This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart ) to show you how to deploy Solace PubSub+ software message brokers in an HA configuration on a 3 node Google Kubernetes Engine (GKE) cluster spread across 3 zones.
 
 ![alt text](/images/network_diagram.png "Network Diagram")
 
@@ -19,13 +19,13 @@ The Solace PubSub+ software message broker meets the needs of big data, cloud mi
 
 This is a 5 step process:
 
-[//]:# (Section 1 prereq is direct copy from here:  https://cloud.google.com/container-registry/docs/quickstart)
+[//]:# (Section 1 prereq is direct copy from here:  https://cloud.google.com/container-registry/docs/quickstart )
 
 **Step 1**: Create a project in Google Cloud Platform and enable these prerequisites:
 
 * In the Cloud Platform Console, go to the Manage Resources page and select or create a new project.
 
-    [GO TO THE MANAGE RESOURCES PAGE](https://console.cloud.google.com/projectselector/iam-admin/projects)
+    [GO TO THE MANAGE RESOURCES PAGE](https://console.cloud.google.com/projectselector/iam-admin/projects )
 
 * Enable billing for your project by following this link.
 
@@ -46,7 +46,7 @@ You can use this quick start template with either PubSub+ `Standard` or PubSub+ 
 | PubSub+ Standard<br/>Docker Image | PubSub+ Enterprise Evaluation Edition<br/>Docker Image
 | :---: | :---: |
 | Free, up to 1k simultaneous connections,<br/>up to 10k messages per second | 90-day trial version, unlimited |
-| [Get URL of Standard Docker Image](http://dev.solace.com/downloads/) | [Get URL of Evaluation Docker Image](http://dev.solace.com/downloads#eval) |
+| [Get URL of Standard Docker Image](http://dev.solace.com/downloads/ ) | [Get URL of Evaluation Docker Image](http://dev.solace.com/downloads#eval ) |
  
 <br>
 <br>
@@ -67,12 +67,12 @@ You can use this quick start template with either PubSub+ `Standard` or PubSub+ 
 <br>
 <br>
 
-* In the Cloud Shell paste the following, (replace `http<nolink>://em.solace.com/...` with the link you received by email from step 2.). As an alternative to using the download link you can also use load versions hosted remotely (if so, a .md5 file needs to be created in the same remote directory).
+* In the Cloud Shell paste the download URL of the Solace PubSub+ software message broker Docker image from step 2.). As an alternative to using the download link you can also use load versions hosted remotely (if so, a .md5 file needs to be created in the same remote directory).
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/copy_solace_image_to_gkr.sh
 chmod 755 copy_solace_image_to_gkr.sh
-./copy_solace_image_to_gkr.sh -u http://em.solace.com/...
+./copy_solace_image_to_gkr.sh -u <DOWNLOAD_URL>
 ```
 
 <br>
@@ -111,7 +111,7 @@ kubectl get services
 ```
 If this fails, you will need to [troubleshoot GKE](https://cloud.google.com/kubernetes-engine/docs/support ).
 
-Also note that during installation of GKE and release Solace HA, several GCP resources, such as GCE nodes, disks and load balancers, are created.  After deleting a Kubernetes release you should validate that all its resources are also deleted.  The [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart(https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#deleting-a-deployment) ) describes how to delete a release. If it's necessary to delete the GKE cluster refer to the [Google Cloud Platform documentation](https://cloud.google.com/sdk/gcloud/reference/container/clusters/delete ).
+Also note that during installation of GKE and release Solace HA, several GCP resources, such as GCE nodes, disks and load balancers, are created.  After deleting a Kubernetes release you should validate that all its resources are also deleted.  The [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#deleting-a-deployment) ) describes how to delete a release. If it is necessary to delete the GKE cluster refer to the [Google Cloud Platform documentation](https://cloud.google.com/sdk/gcloud/reference/container/clusters/delete ).
 
 <br>
 <br>
@@ -133,13 +133,13 @@ chmod 755 configure.sh
   CLOUD_PROVIDER=gcp
 ```
 
-* Execute the configuration script, which will install the required version of the `helm` tool then download and prepare the `solace` helm chart. It will be ready for creating a `production` HA message broker deployment, with up to 1000 connections, using a provisioned PersistentVolume (PV) storage. For other deployment configuration options refer to the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#using-other-vmr-deployment-configurations ).
+* Execute the configuration script, which will install the required version of the `helm` tool then download and prepare the `solace` helm chart. It will be ready for creating a `production` HA message broker deployment, with up to 1000 connections, using a provisioned PersistentVolume (PV) storage. For other deployment configuration options refer to the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#other-message-broker-deployment-configurations ).
 
 ```sh
 ./configure.sh -c ${CLOUD_PROVIDER} -p ${PASSWORD} -i ${SOLACE_IMAGE_URL} -v values-examples/prod1k-persist-ha-provisionPvc.yaml
 ```
 
-* Finally, use `helm` to install the deployment from the `solace` chart location. For more information about how `helm` is used, refer to the [Solace Kubernetes Quickstart README](https://github.com/SolaceDev/solace-kubernetes-quickstart/tree/master#step-5).
+* Finally, use `helm` to install the deployment from the `solace` chart location. For more information about how `helm` is used, refer to the [Solace Kubernetes Quickstart README](https://github.com/SolaceDev/solace-kubernetes-quickstart/tree/master#step-5 ).
 
 ```sh
 cd solace-kubernetes-quickstart/solace
@@ -227,13 +227,13 @@ It is possible to watch the message broker come up via logs in the Google Cloud 
 
 The external management IP will be the Public IP associated with your GCE instance. Access will go through the load balancer service as described in the introduction and will always point to the active message broker. The default port is 22 for CLI and 8080 for SEMP/SolAdmin.
 
-See the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#gaining-admin-access-to-the-vmr ) for more details including admin and ssh access to the individual message brokers.
+See the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#gaining-admin-access-to-the-message-broker ) for more details including admin and ssh access to the individual message brokers.
 
 ## Testing Data access to the message broker
 
 To test data traffic though the newly created message broker instance, visit the Solace Developer Portal and select your preferred programming language to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/ ). Under each language there is a Publish/Subscribe tutorial that will help you get started.
 
-Note: The Host will be the Public IP. It may be necessary to [open up external access to a port](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#upgradingmodifying-the-vmr-cluster) used by the particular messaging API if it is not already exposed.
+Note: The Host will be the Public IP. It may be necessary to [open up external access to a port](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#upgradingmodifying-the-message-broker-cluster ) used by the particular messaging API if it is not already exposed.
 
 ![alt text](/images/solace_tutorial.png "getting started publish/subscribe")
 
@@ -245,7 +245,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ## Authors
 
-See the list of [contributors](https://github.com/SolaceProducts/solace-gke-quickstart/graphs/contributors) who participated in this project.
+See the list of [contributors](https://github.com/SolaceProducts/solace-gke-quickstart/graphs/contributors ) who participated in this project.
 
 ## License
 
