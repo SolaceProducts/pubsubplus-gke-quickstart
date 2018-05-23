@@ -22,7 +22,7 @@
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
-cluster_name="solace-vmr-cluster"
+cluster_name="solace-cluster"
 machine_type="n1-standard-4"
 image_type="UBUNTU"
 number_of_nodes="1"
