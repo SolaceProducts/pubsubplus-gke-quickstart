@@ -16,17 +16,13 @@
 # limitations under the License.
 
 # The purpose of this script is to:
-#  - take a URL to a Solace VMR docker container
-#  - validate the container against known MD5
-#  - load the container to create a local instance
-#  - upload the instance into google container registery
-#  - clean up load docker
+#  - create a GCP cluster to host a Solace PubSub+ message broker deployment
 
 
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
-cluster_name="solace-vmr-cluster"
+cluster_name="solace-cluster"
 machine_type="n1-standard-4"
 image_type="UBUNTU"
 number_of_nodes="1"
@@ -56,8 +52,6 @@ echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, i
 
 echo "`date` INFO: INITIALIZE GCLOUD"
 echo "#############################################################"
-gcloud components install kubectl
-
 IFS=',' read -ra zone_array <<< "$zones"
 
 if [[ ! -z ${zone_array[2]} ]]; then
