@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/SolaceDev/solace-gke-quickstart.svg?branch=master)](https://travis-ci.org/SolaceDev/solace-gke-quickstart)
+[![Build Status](https://travis-ci.org/SolaceProducts/solace-gke-quickstart.svg?branch=master)](https://travis-ci.org/SolaceProducts/solace-gke-quickstart)
 
 # Deploying a Solace PubSub+ Software Message Broker HA group onto a Google Kubernetes Engine (gke) cluster
 
