@@ -23,7 +23,7 @@ This is a 5 step process:
 
 [//]:# (Section 1 prereq is direct copy from here:  https://cloud.google.com/container-registry/docs/quickstart )
 
-**Step 1**: Create a project in Google Cloud Platform and enable these prerequisites:
+### Step 1: Create a project in Google Cloud Platform and enable prerequisites
 
 * In the Cloud Platform Console, go to the Manage Resources page and select or create a new project.
 
@@ -41,7 +41,7 @@ This is a 5 step process:
 <br>
 <br>
 
-**Step 2**: Obtain a reference to the docker image of the Solace  PubSub+ message broker to be deployed
+### Step 2: Obtain a reference to the docker image of the Solace  PubSub+ message broker to be deployed
 
 First, decide which [Solace PubSub+ message broker](https://docs.solace.com/Solace-SW-Broker-Set-Up/Setting-Up-SW-Brokers.htm ) and version is suitable to your use case.
 
@@ -50,17 +50,19 @@ The docker image reference can be:
 *	A public or accessible private docker registry repository name with an optional tag. This is the recommended option if using PubSub+ Standard. The default is to use the latest message broker image [available from Docker Hub](https://hub.docker.com/r/solace/solace-pubsub-standard/ ) as `solace/solace-pubsub-standard:latest`, or use a specific version tag.
 
 *	A docker image download URL
-  * If using Solace PubSub+ Enterprise Evaluation Edition, go to the Solace Downloads page. For the image reference, copy and use the download URL in the Solace PubSub+ Enterprise Evaluation Edition Docker Images section.
+   * If using Solace PubSub+ Enterprise Evaluation Edition, go to the Solace Downloads page. For the image reference, copy and use the download URL in the Solace PubSub+ Enterprise Evaluation Edition Docker Images section.
 
-  | PubSub+ Standard<br/>Docker Image | PubSub+ Enterprise Evaluation Edition<br/>Docker Image
-| :---: | :---: |
-| Free, up to 1k simultaneous connections,<br/>up to 10k messages per second | 90-day trial version of PubSub+ Enterprise |
-| [Get URL of Standard Docker Image](http://dev.solace.com/downloads/) | [Get URL of Evaluation Docker Image](http://dev.solace.com/downloads#eval ) |
+<p align="center">
+| PubSub+ Enterprise Evaluation Edition<br/>Docker Image
+| :---: |
+| 90-day trial version of PubSub+ Enterprise |
+| [Get URL of Evaluation Docker Image](http://dev.solace.com/downloads#eval ) |
+</p>
 
-  * If you have purchased a Docker image of Solace PubSub+ Enterprise, Solace will give you information for how to download the compressed tar archive package from a secure Solace server. Contact Solace Support at support@solace.com if you require assistance. Then you can host this tar archive together with its MD5 on a file server and use the download URL as the image reference.
+   * If you have purchased a Docker image of Solace PubSub+ Enterprise, Solace will give you information for how to download the compressed tar archive package from a secure Solace server. Contact Solace Support at support@solace.com if you require assistance. Then you can host this tar archive together with its MD5 on a file server and use the download URL as the image reference.
 
 
-**Step 3 (Optional)**: Place the message broker in Google Container Registry, using a script
+### Step 3 (Optional): Place the message broker in Google Container Registry, using a script
 
 **Hint:** You may skip this step if using the free PubSub+ Standard Edition available from the [Solace public Docker Hub registry](https://hub.docker.com/r/solace/solace-pubsub-standard/tags/ ). The docker registry reference to use will be `solace/solace-pubsub-standard:<TagName>`. 
 
@@ -95,7 +97,7 @@ chmod 755 copy_solace_image_to_gkr.sh
 <br>
 <br>
 
-**Step 4**: Use Google Cloud SDK or Cloud Shell to create the three node GKE cluster.
+### Step 4: Use Google Cloud SDK or Cloud Shell to create the three node GKE cluster
 
 * Download and execute the cluster creation script. It would be alright to accept the default values for all the script's arguments if you were setting up and running a single message broker; however, some need to be changed to support the 3 node HA cluster. If you want to run the HA cluster in a single GCP zone, specify `-n = 3` as the number of nodes per zone and a single `-z <zone>`. If you want the HA cluster spread across 3 zones within a region - which is the configuration recommended for production situations - specify the 3 zones as per the example below, but leave the number of nodes per zone at the default value of 1.
 
@@ -129,7 +131,9 @@ Also note that during installation of GKE and release Solace HA, several GCP res
 <br>
 <br>
 
-**Step 5**: Use Google Cloud SDK or Cloud Shell to deploy Solace message broker Pods and Service to that cluster. This will finish with a message broker HA configuration deployed to GKE.
+### Step 5: Use Google Cloud SDK or Cloud Shell to deploy Solace message broker Pods and Service to that cluster
+
+This will finish with a message broker HA configuration deployed to GKE.
 
 * Retrieve the Solace Kubernetes QuickStart from GitHub:
 
