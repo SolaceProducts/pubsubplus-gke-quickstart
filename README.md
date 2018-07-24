@@ -78,7 +78,7 @@ The docker image reference can be:
 <br>
 <br>
 
-* In the Cloud Shell paste the download URL of the Solace PubSub+ software message broker Docker image from step 2.). As an alternative to using the download link you can also use load versions hosted remotely (if so, a .md5 file needs to be created in the same remote directory).
+* In the shell paste the download URL of the Solace PubSub+ software message broker Docker image from [step 2](https://github.com/SolaceDev/solace-gke-quickstart/tree/SolaceDockerHubSupport#step-2-obtain-a-reference-to-the-docker-image-of-the-solace--pubsub-message-broker-to-be-deployed ).). As an alternative to using the download link you can also use load versions hosted remotely (if so, a .md5 file needs to be created in the same remote directory).
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/copy_solace_image_to_gkr.sh
@@ -88,7 +88,7 @@ chmod 755 copy_solace_image_to_gkr.sh
 
 <br>
 
-* The script will end with showing a `SOLACE_IMAGE_URL` link required for Step 5.  You can view the new entry on the Google Container Registry in the Cloud Platform Console:
+* The script will end with showing a `SOLACE_IMAGE_URL` link required for [Step 5](https://github.com/SolaceDev/solace-gke-quickstart/tree/SolaceDockerHubSupport#step-5-use-google-cloud-sdk-or-cloud-shell-to-deploy-solace-message-broker-pods-and-service-to-that-cluster ).  You can view the new entry on the Google Container Registry in the Cloud Platform Console:
 
 ![alt text](/images/google_container_registry.png "Google Container Registry")
 
@@ -145,10 +145,10 @@ cd solace-kubernetes-quickstart
 
 Notes:
 
-* Providing `-i SOLACE_IMAGE_URL` is optional (see [Step 3](#step-3-load-the-message-broker-docker-image-to-your-docker-registry ) if using the latest Solace PubSub+ Standard edition message broker image from the Solace public Docker Hub registry
+* Providing `-i SOLACE_IMAGE_URL` is optional (see [Step 3](#step-3-optional-place-the-message-broker-in-google-container-registry-using-a-script ), if using the latest Solace PubSub+ Standard edition message broker image from the Solace public Docker Hub registry
 * Set the cloud provider option to `-c gcp` because you are deploying to Google Cloud Platform.
 
-Execute the configuration script, which will install the required version of the `helm` tool then customize the `solace` helm chart. It will be ready for creating a `production` HA message broker deployment, with up to 1000 connections, using a provisioned PersistentVolume (PV) storage. For other deployment configuration options refer to the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#other-message-broker-deployment-configurations ).
+Execute the configuration script, which will install the `helm` tool if it doesn't exist then customize the `solace` helm chart. It will be ready for creating a `production` HA message broker deployment, with up to 1000 connections, using a provisioned PersistentVolume (PV) storage. For other deployment configuration options refer to the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#other-message-broker-deployment-configurations ).
 
 ```
 cd ~/workspace/solace-kubernetes-quickstart/solace
@@ -162,7 +162,7 @@ watch oc get statefulset,service,pods,pvc,pv --show-labels
 
 ### Validate the Deployment
 
-Now you can validate your deployment in the Google Cloud Shell:
+Now you can validate your deployment:
 
 ```sh
 prompt:~$ kubectl get statefulsets,services,pods,pvc,pv
