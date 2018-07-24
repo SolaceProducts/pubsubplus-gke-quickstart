@@ -52,12 +52,12 @@ The docker image reference can be:
 *	A docker image download URL
      * If using Solace PubSub+ Enterprise Evaluation Edition, go to the Solace Downloads page. For the image reference, copy and use the download URL in the Solace PubSub+ Enterprise Evaluation Edition Docker Images section.
 
-| PubSub+ Enterprise Evaluation Edition<br/>Docker Image
-| :---: |
-| 90-day trial version of PubSub+ Enterprise |
-| [Get URL of Evaluation Docker Image](http://dev.solace.com/downloads#eval ) |
+    | PubSub+ Enterprise Evaluation Edition<br/>Docker Image
+    | :---: |
+    | 90-day trial version of PubSub+ Enterprise |
+    | [Get URL of Evaluation Docker Image](http://dev.solace.com/downloads#eval ) |
 
-     * If you have purchased a Docker image of Solace PubSub+ Enterprise, Solace will give you information for how to download the compressed tar archive package from a secure Solace server. Contact Solace Support at support@solace.com if you require assistance. Then you can host this tar archive together with its MD5 on a file server and use the download URL as the image reference.
+If you have purchased a Docker image of Solace PubSub+ Enterprise, Solace will give you information for how to download the compressed tar archive package from a secure Solace server. Contact Solace Support at support@solace.com if you require assistance. Then you can host this tar archive together with its MD5 on a file server and use the download URL as the image reference.
 
 
 ### Step 3 (Optional): Place the message broker in Google Container Registry, using a script
