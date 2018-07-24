@@ -100,7 +100,7 @@ repoName=`echo $local_repo | awk '{print$1}'`
 tag=`echo $local_repo | awk '{print$2}'`
 imageId=`echo $local_repo | awk '{print$3}'`
 
-echo "`date` INFO: PUSH SOLACE VMR INSTANCE INTO GOOGLE CONTAINER REGISTRY"
+echo "`date` INFO: PUSH SOLACE PUBSUB+ IMAGE INSTANCE INTO GOOGLE CONTAINER REGISTRY"
 echo "##########################################################################################"
 if [ -z "${DEVSHELL_PROJECT_ID}" ]; then
   DEVSHELL_PROJECT_ID=`gcloud projects list | awk 'FNR>1 {print$1}'`
