@@ -47,7 +47,7 @@ First, decide which [Solace PubSub+ message broker](https://docs.solace.com/Sola
 
 The docker image reference can be:
 
-*	A public or accessible private docker registry repository name with an optional tag. This is the recommended option if using PubSub+ Standard. The default is to use the latest message broker image [available from Docker Hub](https://hub.docker.com/r/solace/solace-pubsub-standard/ ) as `solace/solace-pubsub-standard:latest`, or use a specific version tag.
+*	A public or accessible private docker registry repository name with an optional tag. This is the recommended option if using PubSub+ Standard. The default is to use the latest message broker image [available from Docker Hub](https://hub.docker.com/r/solace/solace-pubsub-standard/ ) as `solace/solace-pubsub-standard:latest`, or use a specific version [tag](https://hub.docker.com/r/solace/solace-pubsub-standard/tags/ ).
 
 *	A docker image download URL
      * If using Solace PubSub+ Enterprise Evaluation Edition, go to the Solace Downloads page. For the image reference, copy and use the download URL in the Solace PubSub+ Enterprise Evaluation Edition Docker Images section.
@@ -58,7 +58,6 @@ The docker image reference can be:
          | [Get URL of Evaluation Docker Image](http://dev.solace.com/downloads#eval ) |
 
      * If you have purchased a Docker image of Solace PubSub+ Enterprise, Solace will give you information for how to download the compressed tar archive package from a secure Solace server. Contact Solace Support at support@solace.com if you require assistance. Then you can host this tar archive together with its MD5 on a file server and use the download URL as the image reference.
-
 
 ### Step 3 (Optional): Place the message broker in Google Container Registry, using a script
 
@@ -143,10 +142,10 @@ cd solace-kubernetes-quickstart
 
 * Update the Solace Kubernetes helm chart values.yaml configuration file for your target deployment with the help of the Kubernetes quick start `configure.sh` script. (Please refer to the [Solace Kubernetes QuickStart](https://github.com/SolaceProducts/solace-kubernetes-quickstart#step-4 ) for further details).
 
-Notes:
+    Notes:
 
-* Providing `-i SOLACE_IMAGE_URL` is optional (see [Step 3](#step-3-optional-place-the-message-broker-in-google-container-registry-using-a-script ), if using the latest Solace PubSub+ Standard edition message broker image from the Solace public Docker Hub registry
-* Set the cloud provider option to `-c gcp` because you are deploying to Google Cloud Platform.
+        * Providing `-i SOLACE_IMAGE_URL` is optional (see [Step 3](#step-3-optional-place-the-message-broker-in-google-container-registry-using-a-script ), if using the latest Solace PubSub+ Standard edition message broker image from the Solace public Docker Hub registry
+        * Set the cloud provider option to `-c gcp` because you are deploying to Google Cloud Platform.
 
 Execute the configuration script, which will install the `helm` tool if it doesn't exist then customize the `solace` helm chart. It will be ready for creating a `production` HA message broker deployment, with up to 1000 connections, using a provisioned PersistentVolume (PV) storage. For other deployment configuration options refer to the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#other-message-broker-deployment-configurations ).
 
@@ -157,8 +156,13 @@ cd ~/workspace/solace-kubernetes-quickstart/solace
 # Initiate the deployment
 helm install . -f values.yaml
 # Wait until all pods running and ready and the active message broker pod label is "active=true"
-watch oc get statefulset,service,pods,pvc,pv --show-labels
+watch kubectl get statefulset,service,pods,pvc,pv --show-labels
 ```
+
+    Additional notes:
+
+        * If you need to repair or modify the deployment, refer to [this section](#modifying-upgrading-or-deleting-the-deployment ).
+        * If using Google Cloud Shell the `helm` installation may be lost because of [known limitations](https://cloud.google.com/shell/docs/limitations ). If the `helm` command no longer responds run `../scripts/configure.sh -r` to repair the helm installation.
 
 ### Validate the Deployment
 
