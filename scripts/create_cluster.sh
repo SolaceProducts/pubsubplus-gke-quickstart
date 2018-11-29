@@ -53,17 +53,9 @@ echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, i
 echo "`date` INFO: INITIALIZE GCLOUD"
 echo "#############################################################"
 IFS=',' read -ra zone_array <<< "$zones"
-
-if [[ ! -z ${zone_array[2]} ]]; then
-  add_zones="${zone_array[1]},${zone_array[2]}"
-else
-  add_zones=""
-fi
-  
-
 gcloud config set compute/zone ${zone_array[0]}
 
 echo "`date` INFO: CREATE CLUSTER"
 echo "#############################################################"
-gcloud container clusters create ${cluster_name} --machine-type=${machine_type} --image-type=${image_type} --additional-zones=${add_zones} --num-nodes=${number_of_nodes}
+gcloud container clusters create ${cluster_name} --machine-type=${machine_type} --image-type=${image_type} --node-locations=${zones} --num-nodes=${number_of_nodes}
 gcloud container clusters get-credentials ${cluster_name}
