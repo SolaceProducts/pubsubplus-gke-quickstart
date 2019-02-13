@@ -27,9 +27,10 @@ machine_type="n1-standard-4"
 image_type="UBUNTU"
 number_of_nodes="1"
 zones="us-central1-b"
+bridge_perf_tune=false
 verbose=0
 
-while getopts "c:i:m:n:z:" opt; do
+while getopts "c:i:m:n:z:b" opt; do
     case "$opt" in
     c)  cluster_name=$OPTARG
         ;;
@@ -41,6 +42,8 @@ while getopts "c:i:m:n:z:" opt; do
         ;;
     z)  zones=$OPTARG
         ;;
+    b)  bridge_perf_tune=true
+        ;;
     esac
 done
 
@@ -48,7 +51,26 @@ shift $((OPTIND-1))
 [ "$1" = "--" ] && shift
 
 verbose=1
-echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, image_type=${image_type}, number_of_nodes=${number_of_nodes}, zones=${zones} ,Leftovers: $@"
+echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, image_type=${image_type}, number_of_nodes=${number_of_nodes}, zones=${zones}, bridge_perf_tune=$(bridge_perf_tune) ,Leftovers: $@"
+
+# multi-region bridge performance tuning
+node_bridge_performance_tune () {
+  command="echo '
+  net.core.rmem_max = 134217728
+  net.core.wmem_max = 134217728
+  net.ipv4.tcp_rmem = 4096 25165824 67108864
+  net.ipv4.tcp_wmem = 4096 25165824 67108864
+  net.ipv4.tcp_mtu_probing=1' | sudo tee /etc/sysctl.d/98-solace-sysctl.conf ; sudo sysctl -p /etc/sysctl.d/98-solace-sysctl.conf"
+
+  list=`gcloud compute instances list | grep gke-$1`
+  echo 'Applying multi-region bridge performance tuning to nodes'
+  while read -r a b c ; do
+    echo $a
+    gcloud compute ssh --ssh-flag="-T -o StrictHostKeyChecking=no" --zone $b $a -- "$command" &>/dev/null &
+  done <<< "$list"
+  wait
+}
+
 
 echo "`date` INFO: INITIALIZE GCLOUD"
 echo "#############################################################"
@@ -58,4 +80,7 @@ gcloud config set compute/zone ${zone_array[0]}
 echo "`date` INFO: CREATE CLUSTER"
 echo "#############################################################"
 gcloud container clusters create ${cluster_name} --machine-type=${machine_type} --image-type=${image_type} --node-locations=${zones} --num-nodes=${number_of_nodes}
+if $bridge_perf_tune ; then
+  node_bridge_performance_tune ${cluster_name}
+fi
 gcloud container clusters get-credentials ${cluster_name}
