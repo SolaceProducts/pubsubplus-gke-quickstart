@@ -51,7 +51,7 @@ shift $((OPTIND-1))
 [ "$1" = "--" ] && shift
 
 verbose=1
-echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, image_type=${image_type}, number_of_nodes=${number_of_nodes}, zones=${zones}, bridge_perf_tune=$(bridge_perf_tune) ,Leftovers: $@"
+echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, image_type=${image_type}, number_of_nodes=${number_of_nodes}, zones=${zones}, bridge_perf_tune=${bridge_perf_tune} ,Leftovers: $@"
 
 # multi-region bridge performance tuning
 node_bridge_performance_tune () {
