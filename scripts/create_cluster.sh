@@ -30,7 +30,7 @@ zones="us-central1-b"
 bridge_perf_tune=false
 verbose=0
 
-while getopts "c:i:m:n:z:b" opt; do
+while getopts "c:i:m:n:z:p" opt; do
     case "$opt" in
     c)  cluster_name=$OPTARG
         ;;
@@ -42,7 +42,7 @@ while getopts "c:i:m:n:z:b" opt; do
         ;;
     z)  zones=$OPTARG
         ;;
-    b)  bridge_perf_tune=true
+    p)  perf_tune=true
         ;;
     esac
 done
@@ -51,10 +51,10 @@ shift $((OPTIND-1))
 [ "$1" = "--" ] && shift
 
 verbose=1
-echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, image_type=${image_type}, number_of_nodes=${number_of_nodes}, zones=${zones}, bridge_perf_tune=${bridge_perf_tune} ,Leftovers: $@"
+echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, image_type=${image_type}, number_of_nodes=${number_of_nodes}, zones=${zones}, perf_tune=${perf_tune} ,Leftovers: $@"
 
 # multi-region bridge performance tuning
-node_bridge_performance_tune () {
+node_performance_tune () {
   command="echo '
   net.core.rmem_max = 134217728
   net.core.wmem_max = 134217728
@@ -80,7 +80,7 @@ gcloud config set compute/zone ${zone_array[0]}
 echo "`date` INFO: CREATE CLUSTER"
 echo "#############################################################"
 gcloud container clusters create ${cluster_name} --machine-type=${machine_type} --image-type=${image_type} --node-locations=${zones} --num-nodes=${number_of_nodes}
-if $bridge_perf_tune ; then
-  node_bridge_performance_tune ${cluster_name}
+if $perf_tune ; then
+  node_performance_tune ${cluster_name}
 fi
 gcloud container clusters get-credentials ${cluster_name}
