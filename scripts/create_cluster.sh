@@ -62,7 +62,7 @@ node_performance_tune () {
   net.ipv4.tcp_wmem = 4096 25165824 67108864
   net.ipv4.tcp_mtu_probing=1' | sudo tee /etc/sysctl.d/98-solace-sysctl.conf ; sudo sysctl -p /etc/sysctl.d/98-solace-sysctl.conf"
 
-  list=`gcloud compute instances list | grep gke-$1`
+  list=`gcloud compute instances list | grep gke-$1-`
   echo 'Applying multi-region bridge performance tuning to nodes'
   while read -r a b c ; do
     echo $a
