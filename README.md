@@ -96,7 +96,9 @@ chmod 755 copy_solace_image_to_gkr.sh
 
 ### Step 4: Use Google Cloud SDK or Cloud Shell to create the three node GKE cluster
 
-* Download and execute the cluster creation script. It would be alright to accept the default values for all the script's arguments if you were setting up and running a single message broker; however, some need to be changed to support the 3 node HA cluster. If you want to run the HA cluster in a single GCP zone, specify `-n = 3` as the number of nodes per zone and a single `-z <zone>`. If you want the HA cluster spread across 3 zones within a region - which is the configuration recommended for production situations - specify the 3 zones as per the example below, but leave the number of nodes per zone at the default value of 1.
+* Download and execute the cluster creation script. Accept the default values for all the script's arguments if you were setting up and running a single message broker; however, some need to be changed to support the 3 node HA cluster. If you want to run the HA cluster in a single GCP zone, specify `-n = 3` as the number of nodes per zone and a single `-z <zone>`. If you want the HA cluster spread across 3 zones within a region - which is the configuration recommended for production situations - specify the 3 zones as per the example below, but leave the number of nodes per zone at the default value of 1.
+
+Important: if connecting Solace brokers across GCP regions, there is a known issue affecting TCP throughput with the default node OS image type Ubuntu and default settings. In this case additionally specify the node image as Container-Optimized OS (cos) from Google and a flag to apply performance tuning: `-i cos -p`. 
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/create_cluster.sh
@@ -108,11 +110,13 @@ This will create a GKE cluster of 3 nodes spread across 3 zones:
 
 ![alt text](/images/Nodes_across_zones.png "Google Container Engine nodes")
 
-Here are two more GKE `create_cluster.sh` arguments you may need to consider changing for your deployment:
+Here are more GKE `create_cluster.sh` arguments you may need to consider changing for your deployment:
 
-* solace-message-broker-cluster: The default cluster name, which can be changed by specifying the `-c <cluster name>` command line argument.
+* The default cluster name is `solace-cluster` which can be changed by specifying the `-c <cluster name>` command line argument.
 
-* n1-standard-4: The default machine type. To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine type>`. Note that the minimum CPU and memory requirements must be satisfied for the targeted message broker size, see the next step.
+* The default machine type is "n1-standard-4". To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine-type>`. Note that the minimum CPU and memory requirements must be satisfied for the targeted message broker size, see the next step.
+
+* The default node OS image type is Ubuntu. Specify [other node image type](https://cloud.google.com/kubernetes-engine/docs/concepts/node-images ) using `-i <image-type>`
 
 <br>
 
