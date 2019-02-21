@@ -32,10 +32,20 @@ script:
   - export EVAL_IMAGE_URL=$SOLACE_IMAGE_URL
   - echo "Testing cluster create script"
   - chmod 755 create_cluster.sh
-  - export TESTCLUSTERNAME="sol-gke-travistest-$(date +%s)"
-  - ./create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f -c $TESTCLUSTERNAME -m g1-small
+  - echo "Testing cluster create script with no perf tuning"
+  - export TESTCLUSTERNAME1="sol-gke-travistest-$(date +%s)"
+  - ./create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f -c $TESTCLUSTERNAME1 -m g1-small
   - kubectl get statefulset,svc,pods,pvc,pv
- 
+  - echo "Testing cluster create script with perf tuning"
+  - export TESTCLUSTERNAME2="sol-gke-travistest-$(date +%s)"
+  - ./create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f -c $TESTCLUSTERNAME2 -m g1-small -i cos -p
+  - gcloud compute instances list --filter 'tags.items:$TESTCLUSTERNAME2' --format='table(name,zone,status)' | sed 1d $rpt
+  - command="sudo ls /etc/sysctl.d"
+  - list=`gcloud compute instances list --filter tags.items:$TESTCLUSTERNAME2 --format='table(name,zone,status)' | sed 1d $rpt`
+  - # Check if occurrences of 99-sysctl.conf and 98-solace-sysctl.conf equal
+  - a=`while read -r a b c ; do (gcloud compute ssh --ssh-flag="-T -o StrictHostKeyChecking=no" --zone $b $a -- "$command" &) ; done <<< "$list" ; sleep 2 ; wait` ; echo $a
+  - bash -c "if [[ `echo \"$a\" | grep -o 99 | wc -l` != `echo \"$a\" | grep -o 98 | wc -l` ]] ; then echo \"Occurrences of 99-sysctl.conf and 98-solace-sysctl.conf not equal\" ; exit 1 ; fi"
+
 
 after_success:
   - echo "Test Success - Branch($TRAVIS_BRANCH) Pull Request($TRAVIS_PULL_REQUEST) Tag($TRAVIS_TAG)"
@@ -46,5 +56,6 @@ after_success:
 after_script:
   - gcloud container images delete $STANDARD_IMAGE_URL --quiet
   - gcloud container images delete $EVAL_IMAGE_URL --quiet
-  - gcloud container clusters delete $TESTCLUSTERNAME --quiet --zone us-central1-b
+  - gcloud container clusters delete $TESTCLUSTERNAME1 --quiet --zone us-central1-b
+  - gcloud container clusters delete $TESTCLUSTERNAME2 --quiet --zone us-central1-b
   - gcloud compute disks list | grep travis | sed 1d $rpt | while read -r a b c; do gcloud compute disks delete $a --zone $b --quiet; done
