@@ -111,7 +111,7 @@ if [ -z "${DEVSHELL_PROJECT_ID}" ]; then
   fi
 fi
 docker tag ${imageId} gcr.io/${DEVSHELL_PROJECT_ID}/${repoName}:${tag}
-gcloud docker -- push gcr.io/${DEVSHELL_PROJECT_ID}/${repoName}:${tag}
+docker push ${imageId} gcr.io/${DEVSHELL_PROJECT_ID}/${repoName}:${tag}
 
 echo "`date` INFO: CLEANUP"
 echo "##########################################"
