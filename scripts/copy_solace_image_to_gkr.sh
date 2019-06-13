@@ -22,18 +22,10 @@ SOLACE_IMAGE_REF="${SOLACE_IMAGE_REF:-solace/solace-pubsub-standard:latest}"
 GCR_HOST="${GCR_HOST:-gcr.io}"
 # The GCR project, default is the current GCP project id
 GCR_PROJECT="${GCR_PROJECT:-`gcloud info | tr -d '[]' | awk '/project:/ {print $2}'`}"
-## Parse legacy params:
-OPTIND=1
-while getopts "u:" opt; do
-  case "$opt" in
-  u)  SOLACE_IMAGE_REF=$OPTARG
-      ;;
-  esac
-done
 ##
-# Provide help if needed
 if [ "$#" -gt  "0" ] ; then
   if [ "$1" = "-h" ] || [ "$1" = "--help" ] ; then
+    # Provide help if needed
     echo "Usage:
     # First assign params to the env to be used by the script:
     # SOLACE_IMAGE_REF defaults to solace/solace-pubsub-standard:latest from Docker Hub
@@ -45,10 +37,22 @@ if [ "$#" -gt  "0" ] ; then
     copy_solace_image_to_gkr.sh
 
     Check script inline comments for more details."
+    exit 1
   else
-    echo "Invalid argument(s), check -h or --help"
+    ## Parse legacy params:
+    OPTIND=1
+    while getopts "u:" opt; do
+      case "$opt" in
+      u)
+          SOLACE_IMAGE_REF=$OPTARG
+          ;;
+      *)
+          echo "Invalid argument(s), check -h or --help"
+          exit 1
+          ;;
+      esac
+    done
   fi
-  exit 1
 fi
 ##
 echo "Using:"

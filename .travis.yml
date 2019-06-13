@@ -39,9 +39,9 @@ script:
   - echo "Testing cluster create script with perf tuning"
   - export TESTCLUSTERNAME2="sol-gke-travistest-$(date +%s)"
   - ./create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f -c $TESTCLUSTERNAME2 -m g1-small -i cos -p
-  - gcloud compute instances list --filter 'tags.items:$TESTCLUSTERNAME2' --format='table(name,zone,status)' | sed 1d $rpt
+  - gcloud compute instances list --format='table(name,zone,status,tags.items)' | grep "'$1'"
   - command="sudo ls /etc/sysctl.d"
-  - list=`gcloud compute instances list --filter tags.items:$TESTCLUSTERNAME2 --format='table(name,zone,status)' | sed 1d $rpt`
+  - list=`gcloud compute instances list --format='table(name,zone,status,tags.items)' | grep "'$1'"`
   - # Check if occurrences of 99-sysctl.conf and 98-solace-sysctl.conf equal
   - a=`while read -r a b c ; do (gcloud compute ssh --ssh-flag="-T -o StrictHostKeyChecking=no" --zone $b $a -- "$command" &) ; done <<< "$list" ; sleep 2 ; wait` ; echo $a
   - bash -c "if [[ `echo \"$a\" | grep -o 99 | wc -l` != `echo \"$a\" | grep -o 98 | wc -l` ]] ; then echo \"Occurrences of 99-sysctl.conf and 98-solace-sysctl.conf not equal\" ; exit 1 ; fi"
