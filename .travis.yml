@@ -21,15 +21,15 @@ before_install:
 install: true
 
 script:
-  - echo "Testing solace image to gkr"
+  - echo "Testing solace image to GCR"
   - cd scripts
   - chmod 755 copy_solace_image_to_gkr.sh
-  - ./copy_solace_image_to_gkr.sh -u $SOLACE_STANDARD_DOCKER_URL_PARAMETER_VALUE | tee results
-  - export `grep SOLACE_IMAGE_URL results`
-  - export STANDARD_IMAGE_URL=$SOLACE_IMAGE_URL
-  - ./copy_solace_image_to_gkr.sh -u $SOLACE_EVAL_DOCKER_URL_PARAMETER_VALUE | tee results
-  - export `grep SOLACE_IMAGE_URL results`
-  - export EVAL_IMAGE_URL=$SOLACE_IMAGE_URL
+  - ./copy_solace_image_to_gkr.sh -u $SOLACE_STANDARD_DOCKER_URL_PARAMETER_VALUE # | tee results
+  - #export `grep SOLACE_IMAGE_URL results`
+  - #export STANDARD_IMAGE_URL=$SOLACE_IMAGE_URL
+  - ./copy_solace_image_to_gkr.sh -u $SOLACE_EVAL_DOCKER_URL_PARAMETER_VALUE # | tee results
+  - #export `grep SOLACE_IMAGE_URL results`
+  - #export EVAL_IMAGE_URL=$SOLACE_IMAGE_URL
   - echo "Testing cluster create script"
   - chmod 755 create_cluster.sh
   - echo "Testing cluster create script with no perf tuning"
