@@ -69,6 +69,7 @@ The docker image reference can be:
       * docker and gcloud CLI installed
       * use `gcloud init` to setup account locally
       * proper Google Cloud permissions have been set: `container.clusterRoleBindings.create` permission is required
+      * [authenticate to the container registry](//cloud.google.com/container-registry/docs/advanced-authentication), running `gcloud auth configure-docker`
 
    * If using the Cloud Shell from the Cloud Platform Console, it can be started in the browser from the red underlined icon in the upper right:
 

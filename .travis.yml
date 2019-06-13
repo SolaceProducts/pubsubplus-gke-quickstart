@@ -17,6 +17,7 @@ before_install:
   - echo $GCP_KEY_FILE | base64 -d > ./keyfile
   - gcloud auth activate-service-account -q $(jq -r .client_email keyfile) --key-file=./keyfile --project  $(jq -r .project_id keyfile)
   - rm ./keyfile
+  - gcloud auth configure-docker --quiet
   
 install: true
 
