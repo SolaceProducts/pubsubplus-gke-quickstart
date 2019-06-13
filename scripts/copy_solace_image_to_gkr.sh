@@ -14,111 +14,110 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# The purpose of this script is to:
-#  - take a URL to a Solace VMR docker container
-#  - validate the container against known MD5
-#  - load the container to create a local instance
-#  - upload the instance into google container registery
-#  - clean up load docker
-
-OPTIND=1         # Reset in case getopts has been used previously in the shell.
-
-# Initialize our own variables:
-solace_url=""
-
-verbose=0
-
+#
+## Params:
+# SOLACE_IMAGE_REF can be a Docker image name from an accessible registry, a download URL or a local file
+SOLACE_IMAGE_REF="${SOLACE_IMAGE_REF:-solace/solace-pubsub-standard:latest}"
+# GCR_HOST is the fully qualified hostname of the GCR server
+GCR_HOST="${GCR_HOST:-gcr.io}"
+# The GCR project, default is the current GCP project id
+GCR_PROJECT="${GCR_PROJECT:-`gcloud info | tr -d '[]' | awk '/project:/ {print $2}'`}"
+## Parse legacy params:
+OPTIND=1
 while getopts "u:" opt; do
-    case "$opt" in
-    u)  solace_url=$OPTARG
-        ;;
-    esac
+  case "$opt" in
+  u)  SOLACE_IMAGE_REF=$OPTARG
+      ;;
+  esac
 done
+##
+# Provide help if needed
+if [ "$#" -gt  "0" ] ; then
+  if [ "$1" = "-h" ] || [ "$1" = "--help" ] ; then
+    echo "Usage:
+    # First assign params to the env to be used by the script:
+    # SOLACE_IMAGE_REF defaults to solace/solace-pubsub-standard:latest from Docker Hub
+    [SOLACE_IMAGE_REF=<docker-repo-or-download-link>] \\
+    # GCR_HOST defaults to gcr.io
+    [GCR_HOST=<hostname>] \\
+    # GCR_PROJECT defaults to the current GCP project
+    [GCR_PROJECT=<project>] \\
+    copy_solace_image_to_gkr.sh
 
-shift $((OPTIND-1))
-[ "$1" = "--" ] && shift
-
-verbose=1
-echo "`date` INFO: solace_url=$solace_url ,Leftovers: $@"
-
-solace_directory=.
-
-echo "###############################################################"
-if [[ ${solace_url} == *"em.solace.com"* ]]; then
-  wget -q -O solace-redirect ${solace_url}
-  wget -q -O ${solace_directory}/solace-redirect ${solace_url} || echo "There has been an issue with downloading the redirect"
-  REAL_LINK=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=%]*" ${solace_directory}/solace-redirect`
-  LOAD_NAME="`echo $REAL_LINK | awk -v FS="(download/|?)" '{print $2}'`"
-  # a redirect link provided by solace
-  wget -O ${solace_directory}/solos.info -nv  https://products.solace.com/download/${LOAD_NAME}_MD5
-elif [[ ${solace_url} == *"solace.com/download"* ]]; then
-  REAL_LINK=${solace_url}
-  # the new download url
-  wget -O ${solace_directory}/solos.info -nv  ${solace_url}_MD5
-else
-  REAL_LINK=${solace_url}
-  # an already-existing load (plus its md5 file) hosted somewhere else (e.g. in an s3 bucket)
-  wget -O ${solace_directory}/solos.info -nv  ${solace_url}.md5
-fi
-
-IFS=' ' read -ra SOLOS_INFO <<< `cat ${solace_directory}/solos.info`
-MD5_SUM=${SOLOS_INFO[0]}
-SolOS_LOAD=${SOLOS_INFO[1]}
-if [ -z ${MD5_SUM} ]; then
-  echo "`date` ERROR: Missing md5sum for the Solace load" | tee /dev/stderr
+    Check script inline comments for more details."
+  else
+    echo "Invalid argument(s), check -h or --help"
+  fi
   exit 1
 fi
-echo "`date` INFO: Reference md5sum is: ${MD5_SUM}"
-
-echo "`date` INFO: Download from URL provided and validate"
-wget -q -O  ${solace_directory}/${SolOS_LOAD} ${REAL_LINK}
-
-LOCAL_OS_INFO=`md5sum ${SolOS_LOAD}`
-IFS=' ' read -ra SOLOS_INFO <<< ${LOCAL_OS_INFO}
-LOCAL_MD5_SUM=${SOLOS_INFO[0]}
-if [ ${LOCAL_MD5_SUM} != ${MD5_SUM} ]; then
-  echo "`date` ERROR: Possible corrupt Solace load, md5sum do not match" | tee /dev/stderr
+##
+echo "Using:"
+echo "SOLACE_IMAGE_REF=$SOLACE_IMAGE_REF"
+echo "GCR_HOST=$GCR_HOST"
+echo "GCR_PROJECT=$GCR_PROJECT"
+echo
+echo "#############################################################"
+# Check for docker installed and running
+if ! docker images >/dev/null 2>&1 || ! service docker status | grep -o running >/dev/null ; then
+  echo "Docker must be installed, running and accessible from current user."
   exit 1
-else
-  echo "`date` INFO: Successfully downloaded ${SolOS_LOAD}"
 fi
-
-echo "`date` INFO: LOAD DOCKER IMAGE INTO LOCAL REGISTRY"
-echo "########################################################################"
-if [ "`docker images "solace-*" -q`" ] ; then
-  echo "`date` INFO: Removing existing images first..."
-  docker rmi -f `docker images "solace-*" -q`
+# Remove any existing Solace image from local docker registry
+if [ "`docker images | grep solace-`" ] ; then
+  echo "Cleaning existing Solace images from local docker repo"
+  docker rmi -f `docker images | grep solace- | awk '{print $3}'` > /dev/null 2>&1
 fi
-docker load -i ${solace_directory}/${SolOS_LOAD}
-
-local_repo=`docker images "solace-*" | grep solace`
-echo "`date` INFO: Current docker images are:"
-echo ${local_repo}
-
-repoName=`echo $local_repo | awk '{print$1}'`
-tag=`echo $local_repo | awk '{print$2}'`
-imageId=`echo $local_repo | awk '{print$3}'`
-
-echo "`date` INFO: PUSH SOLACE PUBSUB+ IMAGE INSTANCE INTO GOOGLE CONTAINER REGISTRY"
-echo "##########################################################################################"
-if [ -z "${DEVSHELL_PROJECT_ID}" ]; then
-  DEVSHELL_PROJECT_ID=`gcloud projects list | awk 'FNR>1 {print$1}'`
-  if [ "`gcloud projects list | awk 'END{print NR}'`" -gt "2" ]; then 
-    echo "Detected following multiple GCP projects. Please run 'export DEVSHELL_PROJECT_ID=' set to the correct one and then rerun this script!" | tee /dev/stderr
-    echo "`gcloud projects list | awk '{print$1}'`"
-    exit 1
+# Loading provided Solace image reference
+echo "Trying to load ${SOLACE_IMAGE_REF} as Docker ref into local Docker registry..."
+if ! docker pull ${SOLACE_IMAGE_REF} ; then
+  echo "Loading as Docker ref failed, retrying to load as local file..."
+  if ! docker load -i ${SOLACE_IMAGE_REF} ; then
+    echo "Loading as a local file failed, retrying as a download link"
+    if [[ ${SOLACE_IMAGE_REF} == *"solace.com/download"* ]]; then
+      MD5_URL=${SOLACE_IMAGE_REF}_MD5
+    else
+      MD5_URL=${SOLACE_IMAGE_REF}.md5
+    fi
+    wget -q -O solos.info -nv  ${MD5_URL}
+    IFS=' ' read -ra SOLOS_INFO <<< `cat solos.info`
+    MD5_SUM=${SOLOS_INFO[0]}
+    SolOS_LOAD=${SOLOS_INFO[1]}
+    if [ -z ${MD5_SUM} ]; then
+      echo "Missing md5sum for the Solace load, tried ${SOLACE_IMAGE_REF}.md5 - exiting."
+      exit 1
+    fi
+    echo "Reference md5sum is: ${MD5_SUM}"
+    echo "Now downloading URL provided and validating"
+    wget -q -O  ${SolOS_LOAD} ${SOLACE_IMAGE_REF}
+    ## Check MD5
+    LOCAL_OS_INFO=`md5sum ${SolOS_LOAD}`
+    IFS=' ' read -ra SOLOS_INFO <<< ${LOCAL_OS_INFO}
+    LOCAL_MD5_SUM=${SOLOS_INFO[0]}
+    if [ -z "${MD5_SUM}" ] || [ "${LOCAL_MD5_SUM}" != "${MD5_SUM}" ]; then
+      echo "Possible corrupt Solace load, md5sum do not match - exiting."
+      exit 1
+    else
+      echo "Successfully downloaded ${SolOS_LOAD}"
+    fi
+    ## Load the image tarball
+    docker load -i ${SolOS_LOAD}
+    rm solos.info ${SolOS_LOAD} # cleanup local files
   fi
 fi
-docker tag ${imageId} gcr.io/${DEVSHELL_PROJECT_ID}/${repoName}:${tag}
-docker push ${imageId} gcr.io/${DEVSHELL_PROJECT_ID}/${repoName}:${tag}
-
-echo "`date` INFO: CLEANUP"
-echo "##########################################"
-
-docker rmi gcr.io/${DEVSHELL_PROJECT_ID}/${repoName}:${tag}
-docker rmi ${imageId}
-
-export SOLACE_IMAGE_URL=gcr.io/${DEVSHELL_PROJECT_ID}/${repoName}:${tag}
-echo "`date` INFO: Record the image reference in the GCR you will need to for next steps"
-echo "SOLACE_IMAGE_URL=${SOLACE_IMAGE_URL}"
+# Determine image details
+SOLACE_IMAGE_ID=`docker images | grep solace | awk '{print $3}'`
+if [ -z "${SOLACE_IMAGE_ID}" ] ; then
+  echo "Could not load a valid Solace docker image - exiting."
+  exit 1
+fi
+echo "Loaded ${SOLACE_IMAGE_REF} to local docker repo"
+SOLACE_IMAGE_NAME=`docker images | grep solace | awk '{split($0,a,"solace/"); print a[2]}' | awk '{print $1}'`
+if [ -z $SOLACE_IMAGE_NAME ] ; then SOLACE_IMAGE_NAME=`docker images | grep solace | awk '{print $1}'`; fi
+SOLACE_IMAGE_TAG=`docker images | grep solace | awk '{print $2}'`
+SOLACE_GCR_IMAGE=${GCR_PROJECT}/${SOLACE_IMAGE_NAME}:${SOLACE_IMAGE_TAG}
+# Tag and load to GCR now
+docker_hub_solace=${SOLACE_IMAGE_REF}
+docker_gcr_solace="${GCR_HOST}/${SOLACE_GCR_IMAGE}"
+docker tag $SOLACE_IMAGE_ID "$docker_gcr_solace"
+docker push "$docker_gcr_solace" || { echo "Push to GCR failed, ensure it is accessible and Docker is logged in with the correct user"; exit 1; }
+echo "Success - GCR image location: $docker_gcr_solace"
