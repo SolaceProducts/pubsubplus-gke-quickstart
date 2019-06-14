@@ -26,10 +26,10 @@ script:
   - cd scripts
   - chmod 755 copy_solace_image_to_gkr.sh
   - ./copy_solace_image_to_gkr.sh -u $SOLACE_STANDARD_DOCKER_URL_PARAMETER_VALUE | tee results
-  - "export STANDARD_IMAGE_URL=`cat results | awk -F \"GCR image location: \" \"{printf $2}\"`"
+  - "export STANDARD_IMAGE_URL=\"$(cat results | awk -F location: '{printf $2}')\""
   - gcloud container images describe $STANDARD_IMAGE_URL
   - ./copy_solace_image_to_gkr.sh -u $SOLACE_EVAL_DOCKER_URL_PARAMETER_VALUE | tee results
-  - "export EVAL_IMAGE_URL=`cat results | awk -F \"GCR image location: \" \"{printf $2}\"`"
+  - "export EVAL_IMAGE_URL=\"$(cat results | awk -F location: '{printf $2}')\""
   - gcloud container images describe $EVAL_IMAGE_URL
   - echo "Testing cluster create script"
   - chmod 755 create_cluster.sh
