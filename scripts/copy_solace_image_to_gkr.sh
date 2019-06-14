@@ -61,9 +61,10 @@ echo "GCR_HOST=$GCR_HOST"
 echo "GCR_PROJECT=$GCR_PROJECT"
 echo
 echo "#############################################################"
-# Check for docker installed and running
+# check pre-requisites gcloud and docker
+command -v gcloud >/dev/null 2>&1 || { echo >&2 "'gcloud' must be installed, aborting."; exit 1; }
 if ! docker images >/dev/null 2>&1 || ! service docker status | grep -o running >/dev/null ; then
-  echo "Docker must be installed, running and accessible from current user."
+  echo "'docker' must be installed, running and accessible from current user."
   exit 1
 fi
 # Remove any existing Solace image from local docker registry
