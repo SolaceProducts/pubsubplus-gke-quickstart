@@ -66,9 +66,10 @@ The docker image reference can be:
 * The script can be executed from an installed Google Cloud SDK Shell or open a Google Cloud Shell from the Cloud Platform Console.
 
    * If using Google Cloud SDK Shell, also setup following dependencies:
-      * docker, gcloud and kubectl installed
+      * docker and gcloud CLI installed
       * use `gcloud init` to setup account locally
       * proper Google Cloud permissions have been set: `container.clusterRoleBindings.create` permission is required
+      * [authenticate to the container registry](//cloud.google.com/container-registry/docs/advanced-authentication), running `gcloud auth configure-docker`
 
    * If using the Cloud Shell from the Cloud Platform Console, it can be started in the browser from the red underlined icon in the upper right:
 
@@ -77,17 +78,26 @@ The docker image reference can be:
 <br>
 <br>
 
-* In the shell paste the download URL of the Solace PubSub+ software message broker Docker image from [step 2](https://github.com/SolaceDev/solace-gke-quickstart/tree/SolaceDockerHubSupport#step-2-obtain-a-reference-to-the-docker-image-of-the-solace--pubsub-message-broker-to-be-deployed ).). As an alternative to using the download link you can also use load versions hosted remotely (if so, a .md5 file needs to be created in the same remote directory).
+* Get and use the script:
 
 ```sh
 wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/copy_solace_image_to_gkr.sh
-chmod 755 copy_solace_image_to_gkr.sh
-./copy_solace_image_to_gkr.sh -u <DOWNLOAD_URL>
+chmod +x copy_solace_image_to_gkr.sh
+# Note how the parameter is assigned through setting env for the script
+SOLACE_IMAGE_REF=<solace-image-location> ./copy_solace_image_to_gkr.sh
 ```
+
+`<solace-image-location>` can be one of the followings:
+- name of a Docker image from a publicly available Docker image registry (default is `solace/solace-pubsub-standard:latest`)
+- a Solace Docker image download URL obtained from the [Solace Downloads site](//solace.com/downloads/)
+- a web server download URL - the corresponding `md5` file must be collocated with the Solace Docker image
+- path to a Solace Docker image tar.gz file in the local file system
+
+Run `./copy_solace_image_to_gkr.sh -h` for additional help.
 
 <br>
 
-* The script will end with showing a `SOLACE_IMAGE_URL` link required for [Step 5](https://github.com/SolaceDev/solace-gke-quickstart/tree/SolaceDockerHubSupport#step-5-use-google-cloud-sdk-or-cloud-shell-to-deploy-solace-message-broker-pods-and-service-to-that-cluster ).  You can view the new entry on the Google Container Registry in the Cloud Platform Console:
+* The script will end with showing the "GCR image location" required for [Step 5](https://github.com/SolaceDev/solace-gke-quickstart/tree/SolaceDockerHubSupport#step-5-use-google-cloud-sdk-or-cloud-shell-to-deploy-solace-message-broker-pods-and-service-to-that-cluster ).  You can view the new entry on the Google Container Registry in the Cloud Platform Console:
 
 ![alt text](/images/google_container_registry.png "Google Container Registry")
 

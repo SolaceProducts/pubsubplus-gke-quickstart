@@ -17,19 +17,20 @@ before_install:
   - echo $GCP_KEY_FILE | base64 -d > ./keyfile
   - gcloud auth activate-service-account -q $(jq -r .client_email keyfile) --key-file=./keyfile --project  $(jq -r .project_id keyfile)
   - rm ./keyfile
+  - gcloud auth configure-docker --quiet
   
 install: true
 
 script:
-  - echo "Testing solace image to gkr"
+  - echo "Testing solace image to GCR"
   - cd scripts
   - chmod 755 copy_solace_image_to_gkr.sh
   - ./copy_solace_image_to_gkr.sh -u $SOLACE_STANDARD_DOCKER_URL_PARAMETER_VALUE | tee results
-  - export `grep SOLACE_IMAGE_URL results`
-  - export STANDARD_IMAGE_URL=$SOLACE_IMAGE_URL
+  - "export STANDARD_IMAGE_URL=\"$(cat results | awk -F location: '{printf $2}')\""
+  - gcloud container images describe $STANDARD_IMAGE_URL
   - ./copy_solace_image_to_gkr.sh -u $SOLACE_EVAL_DOCKER_URL_PARAMETER_VALUE | tee results
-  - export `grep SOLACE_IMAGE_URL results`
-  - export EVAL_IMAGE_URL=$SOLACE_IMAGE_URL
+  - "export EVAL_IMAGE_URL=\"$(cat results | awk -F location: '{printf $2}')\""
+  - gcloud container images describe $EVAL_IMAGE_URL
   - echo "Testing cluster create script"
   - chmod 755 create_cluster.sh
   - echo "Testing cluster create script with no perf tuning"
@@ -39,9 +40,9 @@ script:
   - echo "Testing cluster create script with perf tuning"
   - export TESTCLUSTERNAME2="sol-gke-travistest-$(date +%s)"
   - ./create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f -c $TESTCLUSTERNAME2 -m g1-small -i cos -p
-  - gcloud compute instances list --filter 'tags.items:$TESTCLUSTERNAME2' --format='table(name,zone,status)' | sed 1d $rpt
+  - gcloud compute instances list --format='table(name,zone,status,tags.items)' | grep "'$TESTCLUSTERNAME2'"
   - command="sudo ls /etc/sysctl.d"
-  - list=`gcloud compute instances list --filter tags.items:$TESTCLUSTERNAME2 --format='table(name,zone,status)' | sed 1d $rpt`
+  - list=`gcloud compute instances list --format='table(name,zone,status,tags.items)' | grep "'$TESTCLUSTERNAME2'"`
   - # Check if occurrences of 99-sysctl.conf and 98-solace-sysctl.conf equal
   - a=`while read -r a b c ; do (gcloud compute ssh --ssh-flag="-T -o StrictHostKeyChecking=no" --zone $b $a -- "$command" &) ; done <<< "$list" ; sleep 2 ; wait` ; echo $a
   - bash -c "if [[ `echo \"$a\" | grep -o 99 | wc -l` != `echo \"$a\" | grep -o 98 | wc -l` ]] ; then echo \"Occurrences of 99-sysctl.conf and 98-solace-sysctl.conf not equal\" ; exit 1 ; fi"

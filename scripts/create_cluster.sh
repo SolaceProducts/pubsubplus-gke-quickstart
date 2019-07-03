@@ -56,7 +56,7 @@ echo "`date` INFO: cluster_name=${cluster_name}, machine_type=${machine_type}, i
 # multi-region bridge performance tuning
 # arguments: $1=clustername
 node_performance_tuning () {
-  list=`gcloud compute instances list --filter tags.items:$1 --format='table(name,zone,status)' | sed 1d $rpt`
+  list=`gcloud compute instances list --format='table(name,zone,status,tags.items)' | grep "'$1'"`
   echo "List of nodes created:"
   echo "$list"
   echo 'Applying multi-region bridge performance tuning to nodes...'
