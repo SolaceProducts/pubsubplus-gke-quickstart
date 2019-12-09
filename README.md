@@ -1,10 +1,10 @@
 [![Build Status](https://travis-ci.org/SolaceProducts/solace-gke-quickstart.svg?branch=master)](https://travis-ci.org/SolaceProducts/solace-gke-quickstart)
 
-# Deploying a Solace PubSub+ Software Message Broker HA group onto a Google Kubernetes Engine (gke) cluster
+# Deploying a Solace PubSub+ Software Event Broker HA group onto a Google Kubernetes Engine (gke) cluster
 
 ## Purpose of this repository
 
-This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart ) to show you how to deploy Solace PubSub+ software message brokers in an HA configuration on a 3 node Google Kubernetes Engine (GKE) cluster spread across 3 zones.
+This repository expands on [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart ) to show you how to deploy Solace PubSub+ software event brokers in an HA configuration on a 3 node Google Kubernetes Engine (GKE) cluster spread across 3 zones.
 
 ![alt text](/images/network_diagram.png "Network Diagram")
 
@@ -13,11 +13,11 @@ This repository expands on [Solace Kubernetes Quickstart](https://github.com/Sol
 - Black         - Disk – Persistent disk mount.
 - Orange/Yellow - Mgmt – Direct CLI/SEMP.
 
-## Description of Solace PubSub+ Software Message Broker
+## Description of Solace PubSub+ Software Event Broker
 
-The Solace PubSub+ software message broker meets the needs of big data, cloud migration, and Internet-of-Things initiatives, and enables microservices and event-driven architecture. Capabilities include topic-based publish/subscribe, request/reply, message queues/queueing, and data streaming for IoT devices and mobile/web apps. The message broker supports open APIs and standard protocols including AMQP, JMS, MQTT, REST, and WebSocket. As well, it can be deployed in on-premise datacenters, natively within private and public clouds, and across complex hybrid cloud environments.
+The Solace PubSub+ software event broker meets the needs of big data, cloud migration, and Internet-of-Things initiatives, and enables microservices and event-driven architecture. Capabilities include topic-based publish/subscribe, request/reply, message queues/queueing, and data streaming for IoT devices and mobile/web apps. The event broker supports open APIs and standard protocols including AMQP, JMS, MQTT, REST, and WebSocket. As well, it can be deployed in on-premise datacenters, natively within private and public clouds, and across complex hybrid cloud environments.
 
-## How to Deploy a Solace PubSub+ Software Message Broker onto GKE
+## How to Deploy a Solace PubSub+ Software Event Broker onto GKE
 
 This is a 5 step process:
 
@@ -41,13 +41,13 @@ This is a 5 step process:
 <br>
 <br>
 
-### Step 2: Obtain a reference to the docker image of the Solace  PubSub+ message broker to be deployed
+### Step 2: Obtain a reference to the docker image of the Solace  PubSub+ event broker to be deployed
 
-First, decide which [Solace PubSub+ message broker](https://docs.solace.com/Solace-SW-Broker-Set-Up/Setting-Up-SW-Brokers.htm ) and version is suitable to your use case.
+First, decide which [Solace PubSub+ event broker](https://docs.solace.com/Solace-SW-Broker-Set-Up/Setting-Up-SW-Brokers.htm ) and version is suitable to your use case.
 
 The docker image reference can be:
 
-*	A public or accessible private docker registry repository name with an optional tag. This is the recommended option if using PubSub+ Standard. The default is to use the latest message broker image [available from Docker Hub](https://hub.docker.com/r/solace/solace-pubsub-standard/ ) as `solace/solace-pubsub-standard:latest`, or use a specific version [tag](https://hub.docker.com/r/solace/solace-pubsub-standard/tags/ ).
+*	A public or accessible private docker registry repository name with an optional tag. This is the recommended option if using PubSub+ Standard. The default is to use the latest event broker image [available from Docker Hub](https://hub.docker.com/r/solace/solace-pubsub-standard/ ) as `solace/solace-pubsub-standard:latest`, or use a specific version [tag](https://hub.docker.com/r/solace/solace-pubsub-standard/tags/ ).
 
 *	A docker image download URL
      * If using Solace PubSub+ Enterprise Evaluation Edition, go to the Solace Downloads page. For the image reference, copy and use the download URL in the Solace PubSub+ Enterprise Evaluation Edition Docker Images section.
@@ -59,7 +59,7 @@ The docker image reference can be:
 
      * If you have purchased a Docker image of Solace PubSub+ Enterprise, Solace will give you information for how to download the compressed tar archive package from a secure Solace server. Contact Solace Support at support@solace.com if you require assistance. Then you can host this tar archive together with its MD5 on a file server and use the download URL as the image reference.
 
-### Step 3 (Optional): Place the message broker in Google Container Registry, using a script
+### Step 3 (Optional): Place the event broker in Google Container Registry, using a script
 
 **Hint:** You may skip this step if using the free PubSub+ Standard Edition available from the [Solace public Docker Hub registry](https://hub.docker.com/r/solace/solace-pubsub-standard/tags/ ). The docker registry reference to use will be `solace/solace-pubsub-standard:<TagName>`. 
 
@@ -106,7 +106,7 @@ Run `./copy_solace_image_to_gkr.sh -h` for additional help.
 
 ### Step 4: Use Google Cloud SDK or Cloud Shell to create the three node GKE cluster
 
-* Download and execute the cluster creation script. Accept the default values for all the script's arguments if you were setting up and running a single message broker; however, some need to be changed to support the 3 node HA cluster. If you want to run the HA cluster in a single GCP zone, specify `-n = 3` as the number of nodes per zone and a single `-z <zone>`. If you want the HA cluster spread across 3 zones within a region - which is the configuration recommended for production situations - specify the 3 zones as per the example below, but leave the number of nodes per zone at the default value of 1.
+* Download and execute the cluster creation script. Accept the default values for all the script's arguments if you were setting up and running a single event broker; however, some need to be changed to support the 3 node HA cluster. If you want to run the HA cluster in a single GCP zone, specify `-n = 3` as the number of nodes per zone and a single `-z <zone>`. If you want the HA cluster spread across 3 zones within a region - which is the configuration recommended for production situations - specify the 3 zones as per the example below, but leave the number of nodes per zone at the default value of 1.
 
 **Important:** if connecting Solace brokers across GCP regions, there is a known issue affecting TCP throughput with the default node OS image type Ubuntu and default settings. In this case additionally specify the node image as Container-Optimized OS (cos) and a flag to apply performance tuning: `-i cos -p`. 
 
@@ -124,7 +124,7 @@ Here are more GKE `create_cluster.sh` arguments you may need to consider changin
 
 * The default cluster name is `solace-cluster` which can be changed by specifying the `-c <cluster name>` command line argument.
 
-* The default machine type is "n1-standard-4". To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine-type>`. Note that the minimum CPU and memory requirements must be satisfied for the targeted message broker size, see the next step.
+* The default machine type is "n1-standard-4". To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine-type>`. Note that the minimum CPU and memory requirements must be satisfied for the targeted event broker size, see the next step.
 
 * The default node OS image type is Ubuntu. Specify [other node image type](https://cloud.google.com/kubernetes-engine/docs/concepts/node-images ) using `-i <image-type>`
 
@@ -142,136 +142,13 @@ Also note that during installation of GKE and release Solace HA, several GCP res
 <br>
 <br>
 
-### Step 5: Use Google Cloud SDK or Cloud Shell to deploy Solace message broker Pods and Service to that cluster
+### Step 5: Use Google Cloud SDK or Cloud Shell to deploy Solace event broker Pods and Service to that cluster
 
-This will finish with a message broker HA configuration deployed to GKE.
+Now that the GKE environment is ready, follow the steps in [the PubSub+ Kubernetes Quickstart](https://github.com/SolaceDev/solace-kubernetes-quickstart/tree/HelmReorg) to deploy a single-node or an HA event broker.
 
-* Retrieve the Solace Kubernetes QuickStart from GitHub:
-
-```
-mkdir ~/workspace; cd ~/workspace
-git clone https://github.com/SolaceProducts/solace-kubernetes-quickstart.git
-cd solace-kubernetes-quickstart
-```
-
-* Update the Solace Kubernetes helm chart values.yaml configuration file for your target deployment with the help of the Kubernetes quick start `configure.sh` script. (Please refer to the [Solace Kubernetes QuickStart](https://github.com/SolaceProducts/solace-kubernetes-quickstart#step-4 ) for further details).
-
-     Notes:
-     * Providing `-i SOLACE_IMAGE_URL` is optional (see [Step 3](#step-3-optional-place-the-message-broker-in-google-container-registry-using-a-script ), if using the latest Solace PubSub+ Standard edition message broker image from the Solace public Docker Hub registry
-     * Set the cloud provider option to `-c gcp` because you are deploying to Google Cloud Platform.
-
-Execute the configuration script, which will install the `helm` tool if it doesn't exist then customize the `solace` helm chart. It will be ready for creating a `production` HA message broker deployment, with up to 1000 connections, using a provisioned PersistentVolume (PV) storage. For other deployment configuration options refer to the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#other-message-broker-deployment-configurations ).
-
-```
-cd ~/workspace/solace-kubernetes-quickstart/solace
-# Substitute <ADMIN_PASSWORD> with the desired password for the management "admin" user.
-../scripts/configure.sh -p <ADMIN_PASSWORD> -c gcp -v values-examples/prod1k-persist-ha-provisionPvc.yaml -i <SOLACE_IMAGE_URL> 
-# Initiate the deployment
-helm install . -f values.yaml
-# Wait until all pods running and ready and the active message broker pod label is "active=true"
-watch kubectl get statefulset,service,pods,pvc,pv --show-labels
-```
-
-Additional notes:
-* If you need to repair or modify the deployment, refer to [this section](#modifying-upgrading-or-deleting-the-deployment ).
-*  If using Google Cloud Shell the `helm` installation may be lost because of [known limitations](https://cloud.google.com/shell/docs/limitations ). If the `helm` command no longer responds run `../scripts/configure.sh -r` to repair the helm installation.
-
-### Validate the Deployment
-
-Now you can validate your deployment:
-
-```sh
-prompt:~$ kubectl get statefulsets,services,pods,pvc,pv
-NAME                          DESIRED   CURRENT   AGE
-statefulsets/XXX-XXX-solace   3         3         4d
-
-NAME                           TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                                       AGE
-svc/XXX-XXX-solace             LoadBalancer   10.19.242.217   107.178.210.65   22:30238/TCP,8080:31684/TCP,55555:32120/TCP   4d
-svc/XXX-XXX-solace-discovery   ClusterIP      None            <none>           8080/TCP                                      4d
-svc/kubernetes                 ClusterIP      10.19.240.1     <none>           443/TCP                                       4d
-
-NAME                  READY     STATUS    RESTARTS   AGE
-po/XXX-XXX-solace-0   1/1       Running   0          4d
-po/XXX-XXX-solace-1   1/1       Running   0          4d
-po/XXX-XXX-solace-2   1/1       Running   0          4d
-
-NAME                        STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS            AGE
-pvc/data-XXX-XXX-solace-0   Bound     pvc-47e3bd45-53ce-11e8-bda4-42010a800031   30Gi       RWO            XXX-XXX-standard   4d
-pvc/data-XXX-XXX-solace-1   Bound     pvc-47e826a0-53ce-11e8-bda4-42010a800031   30Gi       RWO            XXX-XXX-standard   4d
-pvc/data-XXX-XXX-solace-2   Bound     pvc-47ef4d7c-53ce-11e8-bda4-42010a800031   30Gi       RWO            XXX-XXX-standard   4d
-
-NAME                                          CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM                           STORAGECLASS       REASON    AGE
-pv/pvc-47e3bd45-53ce-11e8-bda4-42010a800031   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-0   XXX-XXX-standard             4d
-pv/pvc-47e826a0-53ce-11e8-bda4-42010a800031   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-1   XXX-XXX-standard             4d
-pv/pvc-47ef4d7c-53ce-11e8-bda4-42010a800031   30Gi       RWO            Delete           Bound     default/data-XXX-XXX-solace-2   XXX-XXX-standard             4d
-
-
-
-$ kubectl describe service XXX-XXX-solace
-Name:                     XXX-XXX-solace
-Namespace:                default
-Labels:                   app=solace
-                          chart=solace-0.3.0
-                          heritage=Tiller
-                          release=XXX-XXX
-Annotations:              <none>
-Selector:                 active=true,app=solace,release=XXX-XXX
-Type:                     LoadBalancer
-IP:                       10.19.242.217
-LoadBalancer Ingress:     107.178.210.65
-Port:                     ssh  22/TCP
-TargetPort:               22/TCP
-NodePort:                 ssh  30238/TCP
-Endpoints:                10.16.0.10:22
-Port:                     semp  8080/TCP
-TargetPort:               8080/TCP
-NodePort:                 semp  31684/TCP
-Endpoints:                10.16.0.10:8080
-Port:                     smf  55555/TCP
-TargetPort:               55555/TCP
-NodePort:                 smf  32120/TCP
-Endpoints:                10.16.0.10:55555
-Session Affinity:         None
-External Traffic Policy:  Cluster
-:
-:
-
-```
-
-<br>
-
-Note here that there are several IPs and ports. In this example `107.178.210.65` is the external Public IP to use, indicated as "LoadBalancer Ingress". This can also be seen from the Google Cloud Console:
-
-![alt text](/images/google_container_loadbalancer.png "GKE Load Balancer")
-
-### Viewing bringup logs
-
-It is possible to watch the message broker come up via logs in the Google Cloud Platform log stack.  Inside Logging look for the GKE Container called solace-message-broker-cluster.  In the example below the Solace admin password was not set, therefore the container would not come up and exited.
-
-![alt text](/images/gke_log_stack.png "GKE Log Stack")
-
-<br>
-<br>
-
-## Gaining admin and ssh access to the message broker
-
-The external management IP will be the Public IP associated with your GCE instance. Access will go through the load balancer service as described in the introduction and will always point to the active message broker. The default port is 22 for CLI and 8080 for SEMP/SolAdmin.
-
-See the [Solace Kubernetes Quickstart README](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#gaining-admin-access-to-the-message-broker ) for more details including admin and ssh access to the individual message brokers.
-
-## Testing Data access to the message broker
-
-To test data traffic though the newly created message broker instance, visit the Solace Developer Portal and select your preferred programming language to [send and receive messages](http://dev.solace.com/get-started/send-receive-messages/ ). Under each language there is a Publish/Subscribe tutorial that will help you get started.
-
-Note: The Host will be the Public IP. It may be necessary to [open up external access to a port](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#upgradingmodifying-the-message-broker-cluster ) used by the particular messaging API if it is not already exposed.
-
-![alt text](/images/solace_tutorial.png "getting started publish/subscribe")
-
-<br>
-
-## Modifying, upgrading or deleting the deployment
-
-Refer to the [Solace Kubernetes QuickStart](https://github.com/SolaceProducts/solace-kubernetes-quickstart#upgradingmodifying-the-message-broker-cluster )
+Refer to the PubSub+ Kubernetes documentation for
+* [Validating the deployment](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#validating-the-deployment); or
+* [Troubleshooting](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#troubleshooting)
 
 ## Contributing
 
