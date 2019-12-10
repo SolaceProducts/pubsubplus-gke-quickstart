@@ -4,7 +4,7 @@
 
 ## Purpose of this repository
 
-This repository extends the [Solace PubSub+ Event Broker in Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart ) to show you how to deploy Solace PubSub+ software event brokers on Google Kubernetes Engine (GKE).
+This repository extends the [PubSub+ Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart ) to show you how to deploy Solace PubSub+ software event brokers on Google Kubernetes Engine (GKE).
 
 The recommended Solace PubSub+ Software Event Broker version is 9.3 or later.
 
@@ -51,12 +51,12 @@ If using an existing GKE cluster your admin shall be able to provide you with th
 
 Script options and arguments:
 
-    * Default (no arguments): creates a one node GKE cluster, can be used if you were setting up and running a single-node event broker
-    * For a multi-node GKE-cluster in a single GCP zone, specify `-n = 3` as the number of nodes per zone and a single `-z <zone>`. 
-    * If you want the HA cluster spread across 3 zones within a region - which is the configuration recommended for production situations - specify the 3 zones as per the example below, but leave the number of nodes per zone at the default value of 1.
-    * The default cluster name is `solace-cluster` which can be changed by specifying the `-c <cluster name>` command line argument.
-    * The default machine type is "n1-standard-4". To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine-type>`. Note that the minimum CPU and memory requirements must be satisfied for the targeted event broker size, see the next step.
-    * The default node OS image type is Ubuntu. Specify [other node image type](https://cloud.google.com/kubernetes-engine/docs/concepts/node-images ) using `-i <image-type>`
+* Default (no arguments): creates a one node GKE cluster, can be used if you were setting up and running a single-node event broker
+* For a multi-node GKE-cluster in a single GCP zone, specify `-n = 3` as the number of nodes per zone and a single `-z <zone>`. 
+* If you want the HA cluster spread across 3 zones within a region - which is the configuration recommended for production situations - specify the 3 zones as per the example below, but leave the number of nodes per zone at the default value of 1.
+* The default cluster name is `solace-cluster` which can be changed by specifying the `-c <cluster name>` command line argument.
+* The default machine type is "n1-standard-4". To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine-type>`. Note that the minimum CPU and memory requirements must be satisfied for the targeted event broker size, see the next step.
+* The default node OS image type is Ubuntu. Specify [other node image type](https://cloud.google.com/kubernetes-engine/docs/concepts/node-images ) using `-i <image-type>`
 
 > **Important:** if connecting Solace brokers across GCP regions, there is a known issue affecting TCP throughput with the default node OS image type Ubuntu and default settings. In this case additionally specify the node image as Container-Optimized OS (cos) and a flag to apply performance tuning: `-i cos -p`. 
 
@@ -69,128 +69,112 @@ chmod +x create_cluster.sh
 ./create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f
 ```
 
-This will create a GKE cluster of 3 nodes spread across 3 zones:
+This will create a GKE cluster of 3 nodes spread across 3 zones and configure the required credentials to access this cluster from the command-line.
 
 ![alt text](/images/Nodes_across_zones.png "Google Container Engine nodes")
 
 <br>
+<br>
 
-You can check that the Kubernetes deployment on GKE is healthy with the following command (which should return a single line with svc/kubernetes):
+You can check that the Kubernetes deployment on GKE is healthy with the following command (which should return the available nodes with their status):
 
 ```sh
-kubectl get services
+kubectl get nodes -o wide
 ```
 If this fails, you will need to [troubleshoot GKE](https://cloud.google.com/kubernetes-engine/docs/support ).
 
+### Step 2: Deploy Helm package manager
 
+We recommend using the [Kubernetes Helm](//github.com/kubernetes/helm/blob/master/README.md ) tool to manage the deployment.
 
-### Step 2: Obtain a reference to the docker image of the Solace  PubSub+ event broker to be deployed
+Refer to the [Install and configure Helm](https://github.com/SolaceDev/solace-kubernetes-quickstart/tree/HelmReorg#2-install-and-configure-helm) section of the PubSub+ Kubernetes Quickstart.
 
-First, decide which [Solace PubSub+ event broker](https://docs.solace.com/Solace-SW-Broker-Set-Up/Setting-Up-SW-Brokers.htm ) and version is suitable to your use case.
+### Step 3 (Optional): Load the PubSub+ Docker image to a private Docker image registry
 
-The docker image reference can be:
+**Hint:** You may skip the rest of this step if not using Google Container Registry (GCR) or other private Docker registry. The free PubSub+ Standard Edition is available from the [public Docker Hub registry](//hub.docker.com/r/solace/solace-pubsub-standard/tags/ ), the image reference is `solace/solace-pubsub-standard:<TagName>`.
 
-*	A public or accessible private docker registry repository name with an optional tag. This is the recommended option if using PubSub+ Standard. The default is to use the latest event broker image [available from Docker Hub](https://hub.docker.com/r/solace/solace-pubsub-standard/ ) as `solace/solace-pubsub-standard:latest`, or use a specific version [tag](https://hub.docker.com/r/solace/solace-pubsub-standard/tags/ ).
+To get the PubSub+ event broker Docker image URL, go to the Solace Developer Portal and download the Solace PubSub+ software event broker as a **docker** image or obtain your version from Solace Support.
 
-*	A docker image download URL
-     * If using Solace PubSub+ Enterprise Evaluation Edition, go to the Solace Downloads page. For the image reference, copy and use the download URL in the Solace PubSub+ Enterprise Evaluation Edition Docker Images section.
+| PubSub+ Standard<br/>Docker Image | PubSub+ Enterprise Evaluation Edition<br/>Docker Image
+| :---: | :---: |
+| Free, up to 1k simultaneous connections,<br/>up to 10k messages per second | 90-day trial version, unlimited |
+| [Download Standard docker image](http://dev.solace.com/downloads/ ) | [Download Evaluation docker image](http://dev.solace.com/downloads#eval ) |
 
-         | PubSub+ Enterprise Evaluation Edition<br/>Docker Image
-         | :---: |
-         | 90-day trial version of PubSub+ Enterprise |
-         | [Get URL of Evaluation Docker Image](http://dev.solace.com/downloads#eval ) |
+The next two sections show how to load a PubSub+ docker image to a Docker image registry.
 
-     * If you have purchased a Docker image of Solace PubSub+ Enterprise, Solace will give you information for how to download the compressed tar archive package from a secure Solace server. Contact Solace Support at support@solace.com if you require assistance. Then you can host this tar archive together with its MD5 on a file server and use the download URL as the image reference.
+#### Loading the PubSub+ Docker image to Google Container Registry (GCR)
 
-### Step 3 (Optional): Place the event broker in Google Container Registry, using a script
+If using GCR for private Docker registry, use the `copy_docker_image_to_gcr.sh` script from this repo.
 
-**Hint:** You may skip this step if using the free PubSub+ Standard Edition available from the [Solace public Docker Hub registry](https://hub.docker.com/r/solace/solace-pubsub-standard/tags/ ). The docker registry reference to use will be `solace/solace-pubsub-standard:<TagName>`. 
+Prerequisites:
+* local installation of [Docker](//docs.docker.com/get-started/ ) is required
+* Ensure `gcloud init` is complete.
 
-* The script can be executed from an installed Google Cloud SDK Shell or open a Google Cloud Shell from the Cloud Platform Console.
-
-   * If using Google Cloud SDK Shell, also setup following dependencies:
-      * docker and gcloud CLI installed
-      * use `gcloud init` to setup account locally
-      * proper Google Cloud permissions have been set: `container.clusterRoleBindings.create` permission is required
-      * [authenticate to the container registry](//cloud.google.com/container-registry/docs/advanced-authentication), running `gcloud auth configure-docker`
-
-   * If using the Cloud Shell from the Cloud Platform Console, it can be started in the browser from the red underlined icon in the upper right:
-
-
-<br>
-<br>
-
-* Get and use the script:
+Script options and arguments:
+* PUBSUBPLUS_IMAGE_URL: the PubSub+ docker image location, can be one of the followings:
+  * name of a Docker image from a publicly available Docker image registry (default is `solace/solace-pubsub-standard:latest`)
+  * a Solace Docker image download URL obtained from the [Solace Downloads site](//solace.com/downloads/)
+  * a web server download URL - the corresponding `md5` file must be collocated with the Solace Docker image
+  * path to a Solace Docker image tar.gz file in the local file system
+* GCR_HOST: fully qualified hostname of the GCR server - default is `gcr.io`
+* GCR_PROJECT: the GCR project, default is the current GCP project id
 
 ```sh
-wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/copy_solace_image_to_gkr.sh
-chmod +x copy_solace_image_to_gkr.sh
-# Note how the parameter is assigned through setting env for the script
-SOLACE_IMAGE_REF=<solace-image-location> ./copy_solace_image_to_gkr.sh
+wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/copy_docker_image_to_gcr.sh
+chmod +x copy_docker_image_to_gcr.sh
+# Define variables up-front to be passed to the "copy_docker_image_to_gcr" script:
+  [PUBSUBPLUS_IMAGE_URL=<docker-repo-or-download-link>] \
+  [GCR_HOST=<hostname>] \
+  [GCR_PROJECT=<project>] \
+  copy_docker_image_to_gcr.sh
 ```
 
-`<solace-image-location>` can be one of the followings:
-- name of a Docker image from a publicly available Docker image registry (default is `solace/solace-pubsub-standard:latest`)
-- a Solace Docker image download URL obtained from the [Solace Downloads site](//solace.com/downloads/)
-- a web server download URL - the corresponding `md5` file must be collocated with the Solace Docker image
-- path to a Solace Docker image tar.gz file in the local file system
-
-Run `./copy_solace_image_to_gkr.sh -h` for additional help.
-
-<br>
-
-* The script will end with showing the "GCR image location" required for [Step 5](https://github.com/SolaceDev/solace-gke-quickstart/tree/SolaceDockerHubSupport#step-5-use-google-cloud-sdk-or-cloud-shell-to-deploy-solace-message-broker-pods-and-service-to-that-cluster ).  You can view the new entry on the Google Container Registry in the Cloud Platform Console:
+The script will end with showing the "GCR image location" in `<your-image-location>:<your-image-tag>` format. You can view the new entry on the Google Container Registry in the Cloud Platform Console:
 
 ![alt text](/images/google_container_registry.png "Google Container Registry")
 
 <br>
 <br>
 
-### Step 4: Use Google Cloud SDK or Cloud Shell to create the three node GKE cluster
+#### Loading the PubSub+ Docker image to other private Docker registry
 
-* Download and execute the cluster creation script. Accept the default values for all the script's arguments if you were setting up and running a single event broker; however, some need to be changed to support the 3 node HA cluster. If you want to run the HA cluster in a single GCP zone, specify `-n = 3` as the number of nodes per zone and a single `-z <zone>`. If you want the HA cluster spread across 3 zones within a region - which is the configuration recommended for production situations - specify the 3 zones as per the example below, but leave the number of nodes per zone at the default value of 1.
+To load the PubSub+ Docker image into other private Docker registry, follow the general steps below; for specifics, consult the documentation of the registry you are using.
 
-**Important:** if connecting Solace brokers across GCP regions, there is a known issue affecting TCP throughput with the default node OS image type Ubuntu and default settings. In this case additionally specify the node image as Container-Optimized OS (cos) and a flag to apply performance tuning: `-i cos -p`. 
-
+* Prerequisite: local installation of [Docker](//docs.docker.com/get-started/ ) is required
+* First load the image to the local docker registry:
 ```sh
-wget https://raw.githubusercontent.com/SolaceProducts/solace-gke-quickstart/master/scripts/create_cluster.sh
-chmod 755 create_cluster.sh
-./create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f
+# Option a): If you have a local tar.gz Docker image file
+sudo docker load -i <solace-pubsub-XYZ-docker>.tar.gz
+# Option b): You can use the public PubSub+ Docker image from Docker Hub
+sudo docker pull solace/solace-pubsub-standard:latest # or specific <TagName>
+
+# Verify the image has been loaded and note the associated "IMAGE ID"
+sudo docker images
+```
+* Login to the private registry:
+```sh
+sudo docker login <private-registry> ...
+```
+* Tag the image with the desired name and tag:
+```sh
+sudo docker tag <image-id> <private-registry>/<path>/<image-name>:<tag>
+```
+* Push the image to the private registry
+```sh
+sudo docker push <private-registry>/<path>/<image-name>:<tag>
 ```
 
-This will create a GKE cluster of 3 nodes spread across 3 zones:
+Note that additional steps may be required if using signed images.
 
-![alt text](/images/Nodes_across_zones.png "Google Container Engine nodes")
-
-Here are more GKE `create_cluster.sh` arguments you may need to consider changing for your deployment:
-
-* The default cluster name is `solace-cluster` which can be changed by specifying the `-c <cluster name>` command line argument.
-
-* The default machine type is "n1-standard-4". To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine-type>`. Note that the minimum CPU and memory requirements must be satisfied for the targeted event broker size, see the next step.
-
-* The default node OS image type is Ubuntu. Specify [other node image type](https://cloud.google.com/kubernetes-engine/docs/concepts/node-images ) using `-i <image-type>`
-
-<br>
-
-You can check that the Kubernetes deployment on GKE is healthy with the following command (which should return a single line with svc/kubernetes):
-
-```sh
-kubectl get services
-```
-If this fails, you will need to [troubleshoot GKE](https://cloud.google.com/kubernetes-engine/docs/support ).
-
-Also note that during installation of GKE and release Solace HA, several GCP resources, such as GCE nodes, disks and load balancers, are created.  After deleting a Kubernetes release you should validate that all its resources are also deleted.  The [Solace Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart/tree/master#deleting-a-deployment) ) describes how to delete a release. If it is necessary to delete the GKE cluster refer to the [Google Cloud Platform documentation](https://cloud.google.com/sdk/gcloud/reference/container/clusters/delete ).
-
-<br>
-<br>
-
-### Step 5: Use Google Cloud SDK or Cloud Shell to deploy Solace event broker Pods and Service to that cluster
+### Step 4: Deploy the event broker
 
 Now that the GKE environment is ready, follow the steps in [the PubSub+ Kubernetes Quickstart](https://github.com/SolaceDev/solace-kubernetes-quickstart/tree/HelmReorg) to deploy a single-node or an HA event broker.
 
 Refer to the PubSub+ Kubernetes documentation for
 * [Validating the deployment](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#validating-the-deployment); or
 * [Troubleshooting](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#troubleshooting)
+* [Modifying or Upgrading](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#modifying-or-upgrading-a-deployment)
+* [Deleting the deployment](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#deleting-a-deployment)
 
 ## Contributing
 

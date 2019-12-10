@@ -27,15 +27,15 @@ install: true
 script:
   - echo "Testing solace image to GCR"
   - cd scripts
-  - chmod 755 copy_solace_image_to_gkr.sh
-  - ./copy_solace_image_to_gkr.sh -u $SOLACE_STANDARD_DOCKER_URL_PARAMETER_VALUE | tee results
+  - chmod +x copy_docker_image_to_gcr.sh
+  - PUBSUBPLUS_IMAGE_URL=$SOLACE_STANDARD_DOCKER_URL_PARAMETER_VALUE ./copy_docker_image_to_gcr.sh | tee results
   - "export STANDARD_IMAGE_URL=\"$(cat results | awk -F location: '{printf $2}')\""
   - gcloud container images describe $STANDARD_IMAGE_URL
-  - ./copy_solace_image_to_gkr.sh -u $SOLACE_EVAL_DOCKER_URL_PARAMETER_VALUE | tee results
+  - PUBSUBPLUS_IMAGE_URL=$SOLACE_EVAL_DOCKER_URL_PARAMETER_VALUE ./copy_docker_image_to_gcr.sh | tee results
   - "export EVAL_IMAGE_URL=\"$(cat results | awk -F location: '{printf $2}')\""
   - gcloud container images describe $EVAL_IMAGE_URL
   - echo "Testing cluster create script"
-  - chmod 755 create_cluster.sh
+  - chmod +x create_cluster.sh
   - echo "Testing cluster create script with no perf tuning"
   - export TESTCLUSTERNAME1="sol-gke-travistest-$(date +%s)"
   - ./create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f -c $TESTCLUSTERNAME1 -m g1-small
