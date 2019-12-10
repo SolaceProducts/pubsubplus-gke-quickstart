@@ -16,6 +16,8 @@ The Solace PubSub+ software event broker meets the needs of big data, cloud migr
 
 The PubSub+ software event broker can be deployed in either a 3-node High-Availability (HA) cluster, or as a single-node non-HA deployment. For simple test environments that need only to validate application functionality, a single instance will suffice. Note that in production, or any environment where message loss cannot be tolerated, an HA cluster is required.
 
+Detailed documentation of deploying the event broker in a Kubernetes environment is provided in the [Solace PubSub+ Event Broker on Kubernetes Guide](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md).
+
 The following diagram illustrates an HA deployment on a 3 node GKE cluster spread across 3 zones.
 
 ![alt text](/images/network_diagram.png "Network Diagram")
@@ -34,7 +36,7 @@ Tasks may include:
 * Get access to the Google Cloud Platform platform, [select or create a new project](//console.cloud.google.com/projectselector2/kubernetes) and enable billing.
 * Install the Kubernetes [`kubectl`](//kubernetes.io/docs/tasks/tools/install-kubectl/ ) tool.
 * Install the [`gcloud`](//cloud.google.com/sdk/gcloud/) command-line tool and initialize it running `gcloud init`.
-* Create a GKE cluster. Ensure to meet [minimum CPU, Memory and Storage requirements](https://github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#cpu-and-memory-requirements) for the targeted PubSub+ configuration size.
+* Create a GKE cluster. Ensure to meet [minimum CPU, Memory and Storage requirements](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#cpu-and-memory-requirements) for the targeted PubSub+ configuration size.
 * Fetch the credentials for the GKE cluster.
 
 Commands can be executed either from your local command-line interface after installing above tools, or open a Google Cloud Shell from the Cloud Platform Console, which already has the tools available:
@@ -47,7 +49,7 @@ If using an existing GKE cluster your admin shall be able to provide you with th
 
 #### Creating a new GKE cluster
 
-* Download and execute the cluster creation script included in this repo.
+Download and execute the cluster creation script included in this repo as in the example below.
 
 Script options and arguments:
 
@@ -55,7 +57,7 @@ Script options and arguments:
 * For a multi-node GKE-cluster in a single GCP zone, specify `-n = 3` as the number of nodes per zone and a single `-z <zone>`. 
 * If you want the HA cluster spread across 3 zones within a region - which is the configuration recommended for production situations - specify the 3 zones as per the example below, but leave the number of nodes per zone at the default value of 1.
 * The default cluster name is `solace-cluster` which can be changed by specifying the `-c <cluster name>` command line argument.
-* The default machine type is "n1-standard-4". To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine-type>`. Note that the minimum CPU and memory requirements must be satisfied for the targeted event broker size, see the next step.
+* The default machine type is "n1-standard-4". To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine-type>`. Note that the [minimum CPU and memory requirements](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#cpu-and-memory-requirements) must be satisfied for the targeted event broker size.
 * The default node OS image type is Ubuntu. Specify [other node image type](https://cloud.google.com/kubernetes-engine/docs/concepts/node-images ) using `-i <image-type>`
 
 > **Important:** if connecting Solace brokers across GCP regions, there is a known issue affecting TCP throughput with the default node OS image type Ubuntu and default settings. In this case additionally specify the node image as Container-Optimized OS (cos) and a flag to apply performance tuning: `-i cos -p`. 
@@ -74,7 +76,6 @@ This will create a GKE cluster of 3 nodes spread across 3 zones and configure th
 ![alt text](/images/Nodes_across_zones.png "Google Container Engine nodes")
 
 <br>
-<br>
 
 You can check that the Kubernetes deployment on GKE is healthy with the following command (which should return the available nodes with their status):
 
@@ -83,11 +84,15 @@ kubectl get nodes -o wide
 ```
 If this fails, you will need to [troubleshoot GKE](https://cloud.google.com/kubernetes-engine/docs/support ).
 
+<br>
+
 ### Step 2: Deploy Helm package manager
 
 We recommend using the [Kubernetes Helm](//github.com/kubernetes/helm/blob/master/README.md ) tool to manage the deployment.
 
 Refer to the [Install and configure Helm](https://github.com/SolaceDev/solace-kubernetes-quickstart/tree/HelmReorg#2-install-and-configure-helm) section of the PubSub+ Kubernetes Quickstart.
+
+<br>
 
 ### Step 3 (Optional): Load the PubSub+ Docker image to a private Docker image registry
 
@@ -99,8 +104,6 @@ To get the PubSub+ event broker Docker image URL, go to the Solace Developer Por
 | :---: | :---: |
 | Free, up to 1k simultaneous connections,<br/>up to 10k messages per second | 90-day trial version, unlimited |
 | [Download Standard docker image](http://dev.solace.com/downloads/ ) | [Download Evaluation docker image](http://dev.solace.com/downloads#eval ) |
-
-The next two sections show how to load a PubSub+ docker image to a Docker image registry.
 
 #### Loading the PubSub+ Docker image to Google Container Registry (GCR)
 
@@ -134,43 +137,14 @@ The script will end with showing the "GCR image location" in `<your-image-locati
 ![alt text](/images/google_container_registry.png "Google Container Registry")
 
 <br>
-<br>
 
-#### Loading the PubSub+ Docker image to other private Docker registry
-
-To load the PubSub+ Docker image into other private Docker registry, follow the general steps below; for specifics, consult the documentation of the registry you are using.
-
-* Prerequisite: local installation of [Docker](//docs.docker.com/get-started/ ) is required
-* First load the image to the local docker registry:
-```sh
-# Option a): If you have a local tar.gz Docker image file
-sudo docker load -i <solace-pubsub-XYZ-docker>.tar.gz
-# Option b): You can use the public PubSub+ Docker image from Docker Hub
-sudo docker pull solace/solace-pubsub-standard:latest # or specific <TagName>
-
-# Verify the image has been loaded and note the associated "IMAGE ID"
-sudo docker images
-```
-* Login to the private registry:
-```sh
-sudo docker login <private-registry> ...
-```
-* Tag the image with the desired name and tag:
-```sh
-sudo docker tag <image-id> <private-registry>/<path>/<image-name>:<tag>
-```
-* Push the image to the private registry
-```sh
-sudo docker push <private-registry>/<path>/<image-name>:<tag>
-```
-
-Note that additional steps may be required if using signed images.
+For general additional information, refer to the [Using private registries](https://github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#using-private-registries) section in the Kubernetes Guide.
 
 ### Step 4: Deploy the event broker
 
-Now that the GKE environment is ready, follow the steps in [the PubSub+ Kubernetes Quickstart](https://github.com/SolaceDev/solace-kubernetes-quickstart/tree/HelmReorg) to deploy a single-node or an HA event broker.
+From here follow the steps in [the PubSub+ Kubernetes Quickstart](//github.com/SolaceDev/solace-kubernetes-quickstart/tree/HelmReorg#2-install-and-configure-helm) to deploy a single-node or an HA event broker.
 
-Refer to the PubSub+ Kubernetes documentation for
+Refer to the detailed PubSub+ Kubernetes documentation for:
 * [Validating the deployment](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#validating-the-deployment); or
 * [Troubleshooting](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#troubleshooting)
 * [Modifying or Upgrading](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#modifying-or-upgrading-a-deployment)
