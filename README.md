@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/SolaceProducts/solace-gke-quickstart.svg?branch=master)](https://travis-ci.org/SolaceProducts/solace-gke-quickstart)
 
-# Deploying a Solace PubSub+ Software Event Broker HA group onto a Google Kubernetes Engine (GKE) cluster
+# Install a Solace PubSub+ Software Event Broker HA group onto a Google Kubernetes Engine (GKE) cluster
 
 ## Purpose of this repository
 

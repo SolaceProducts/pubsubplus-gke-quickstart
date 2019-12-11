@@ -38,6 +38,9 @@ if [ "$#" -gt  "0" ] ; then
 
     Check script inline comments for more details."
     exit 1
+  else
+    echo "Invalid argument(s), check -h or --help"
+    exit 1
   fi
 fi
 ##
@@ -53,12 +56,12 @@ if ! docker images >/dev/null 2>&1 || ! service docker status | grep -o running 
   echo "'docker' must be installed, running and accessible from current user."
   exit 1
 fi
-# Remove any existing Solace image from local docker registry
+# Remove any existing PubSub+ image from local docker registry
 if [ "`docker images | grep solace-`" ] ; then
-  echo "Cleaning existing Solace images from local docker repo"
+  echo "Removing existing PubSub+ images from local docker repo"
   docker rmi -f `docker images | grep solace- | awk '{print $3}'` > /dev/null 2>&1
 fi
-# Loading provided Solace image reference
+# Loading provided PubSub+ image reference
 echo "Trying to load ${PUBSUBPLUS_IMAGE_URL} as Docker ref into local Docker registry..."
 if ! docker pull ${PUBSUBPLUS_IMAGE_URL} ; then
   echo "Loading as Docker ref failed, retrying to load as local file..."
@@ -74,7 +77,7 @@ if ! docker pull ${PUBSUBPLUS_IMAGE_URL} ; then
     MD5_SUM=${SOLOS_INFO[0]}
     SolOS_LOAD=${SOLOS_INFO[1]}
     if [ -z ${MD5_SUM} ]; then
-      echo "Missing md5sum for the Solace load, tried ${PUBSUBPLUS_IMAGE_URL}.md5 - exiting."
+      echo "Missing md5sum for the PubSub+ load, tried ${PUBSUBPLUS_IMAGE_URL}.md5 - exiting."
       exit 1
     fi
     echo "Reference md5sum is: ${MD5_SUM}"
@@ -85,7 +88,7 @@ if ! docker pull ${PUBSUBPLUS_IMAGE_URL} ; then
     IFS=' ' read -ra SOLOS_INFO <<< ${LOCAL_OS_INFO}
     LOCAL_MD5_SUM=${SOLOS_INFO[0]}
     if [ -z "${MD5_SUM}" ] || [ "${LOCAL_MD5_SUM}" != "${MD5_SUM}" ]; then
-      echo "Possible corrupt Solace load, md5sum do not match - exiting."
+      echo "Possible corrupt PubSub+ load, md5sum do not match - exiting."
       exit 1
     else
       echo "Successfully downloaded ${SolOS_LOAD}"
@@ -96,19 +99,19 @@ if ! docker pull ${PUBSUBPLUS_IMAGE_URL} ; then
   fi
 fi
 # Determine image details
-SOLACE_IMAGE_ID=`docker images | grep solace | awk '{print $3}'`
-if [ -z "${SOLACE_IMAGE_ID}" ] ; then
-  echo "Could not load a valid Solace docker image - exiting."
+PUBSUBPLUS_IMAGE_ID=`docker images | grep solace | awk '{print $3}'`
+if [ -z "${PUBSUBPLUS_IMAGE_ID}" ] ; then
+  echo "Could not load a valid PubSub+ docker image - exiting."
   exit 1
 fi
 echo "Loaded ${PUBSUBPLUS_IMAGE_URL} to local docker repo"
-SOLACE_IMAGE_NAME=`docker images | grep solace | awk '{split($0,a,"solace/"); print a[2]}' | awk '{print $1}'`
-if [ -z $SOLACE_IMAGE_NAME ] ; then SOLACE_IMAGE_NAME=`docker images | grep solace | awk '{print $1}'`; fi
-SOLACE_IMAGE_TAG=`docker images | grep solace | awk '{print $2}'`
-SOLACE_GCR_IMAGE=${GCR_PROJECT}/${SOLACE_IMAGE_NAME}:${SOLACE_IMAGE_TAG}
+PUBSUBPLUS_IMAGE_NAME=`docker images | grep solace | awk '{split($0,a,"solace/"); print a[2]}' | awk '{print $1}'`
+if [ -z $PUBSUBPLUS_IMAGE_NAME ] ; then PUBSUBPLUS_IMAGE_NAME=`docker images | grep solace | awk '{print $1}'`; fi
+PUBSUBPLUS_IMAGE_TAG=`docker images | grep solace | awk '{print $2}'`
+PUBSUBPLUS_GCR_IMAGE=${GCR_PROJECT}/${PUBSUBPLUS_IMAGE_NAME}:${PUBSUBPLUS_IMAGE_TAG}
 # Tag and load to GCR now
 docker_hub_solace=${PUBSUBPLUS_IMAGE_URL}
-docker_gcr_solace="${GCR_HOST}/${SOLACE_GCR_IMAGE}"
-docker tag $SOLACE_IMAGE_ID "$docker_gcr_solace"
+docker_gcr_solace="${GCR_HOST}/${PUBSUBPLUS_GCR_IMAGE}"
+docker tag $PUBSUBPLUS_IMAGE_ID "$docker_gcr_solace"
 docker push "$docker_gcr_solace" || { echo "Push to GCR failed, ensure it is accessible and Docker is logged in with the correct user"; exit 1; }
 echo "Success - GCR image location: $docker_gcr_solace"
