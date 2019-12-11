@@ -6,7 +6,7 @@
 
 This repository extends the [PubSub+ Kubernetes Quickstart](https://github.com/SolaceProducts/solace-kubernetes-quickstart ) to show you how to deploy Solace PubSub+ software event brokers on Google Kubernetes Engine (GKE).
 
-The recommended Solace PubSub+ Software Event Broker version is 9.3 or later.
+The recommended Solace PubSub+ Software Event Broker version is 9.4 or later.
 
 ## Description of Solace PubSub+ Software Event Broker
 
