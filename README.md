@@ -16,7 +16,9 @@ The Solace PubSub+ software event broker meets the needs of big data, cloud migr
 
 The PubSub+ software event broker can be deployed in either a 3-node High-Availability (HA) cluster, or as a single-node non-HA deployment. For simple test environments that need only to validate application functionality, a single instance will suffice. Note that in production, or any environment where message loss cannot be tolerated, an HA cluster is required.
 
-Detailed documentation of deploying the event broker in a Kubernetes environment is provided in the [Solace PubSub+ Event Broker on Kubernetes Guide](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md).
+Detailed documentation of deploying the event broker in a general Kubernetes environment is provided in the [Solace PubSub+ Event Broker on Kubernetes Documentation](//github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md).
+
+Consult the [Deployment Considerations](https://github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#pubsub-event-broker-deployment-considerations) section of the Documentation when planning your deployment.
 
 The following diagram illustrates an HA deployment on a 3 node GKE cluster spread across 3 zones.
 
@@ -132,13 +134,15 @@ chmod +x copy_docker_image_to_gcr.sh
   copy_docker_image_to_gcr.sh
 ```
 
-The script will end with showing the "GCR image location" in `<your-image-location>:<your-image-tag>` format. You can view the new entry on the Google Container Registry in the Cloud Platform Console:
+The script will end with showing the "GCR image location" in `<your-image-location>:<your-image-tag>` format and this shall be passed to the PubSub+ deployment parameters `image.repository` and `image.tag` respectively.
+
+You can also view the new entry on the Google Container Registry in the Cloud Platform Console:
 
 ![alt text](/images/google_container_registry.png "Google Container Registry")
 
 <br>
 
-For general additional information, refer to the [Using private registries](https://github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#using-private-registries) section in the Kubernetes Guide.
+For general additional information, refer to the [Using private registries](https://github.com/SolaceDev/solace-kubernetes-quickstart/blob/HelmReorg/docs/PubSubPlusK8SDeployment.md#using-private-registries) section in the PubSub+ Kubernetes Documentation.
 
 ### Step 4: Deploy the event broker
 
