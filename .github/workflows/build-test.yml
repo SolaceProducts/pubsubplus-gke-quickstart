@@ -23,7 +23,7 @@ jobs:
       run: |
         echo "TESTRUNBRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
         #
-        snap install kubectl --classic
+        sudo snap install kubectl --classic
         kubectl version --client
 
     - name: Checkout
