@@ -1,0 +1,79 @@
+name: build
+
+# Controls when the action will run. 
+on:
+  pull_request:
+
+  push:
+
+# on:
+#   push:
+
+#   schedule:
+#   - cron: "0/10 * * * *"
+
+jobs:
+  deploy:
+    name: GKE CI test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+    - name: Set env and tools
+      run: |
+        echo "TESTRUNBRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+        #
+        sudo snap install kubectl --classic
+        kubectl version --client
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+    - name: Testing solace image to GCR
+      run: |
+        gcloud auth configure-docker --quiet
+        chmod +x scripts/copy_docker_image_to_gcr.sh
+        PUBSUBPLUS_IMAGE_URL=${{ secrets.BROKER_DOCKER_IMAGE_REF }} scripts/copy_docker_image_to_gcr.sh | tee results
+        STANDARD_IMAGE_URL="$(cat results | awk -F location: '{printf $2}')";
+        echo "STANDARD_IMAGE_URL=$STANDARD_IMAGE_URL" >> $GITHUB_ENV
+        gcloud container images describe $STANDARD_IMAGE_URL
+        #
+        PUBSUBPLUS_IMAGE_URL="https://products.solace.com/download/PUBSUB_DOCKER_EVAL" scripts/copy_docker_image_to_gcr.sh | tee results
+        EVAL_IMAGE_URL="$(cat results | awk -F location: '{printf $2}')"
+        echo "EVAL_IMAGE_URL=$EVAL_IMAGE_URL" >> $GITHUB_ENV
+        gcloud container images describe $EVAL_IMAGE_URL
+
+    - name: Testing cluster create script
+      run: |
+        chmod +x scripts/create_cluster.sh
+        echo "Testing cluster create script with no perf tuning"
+        TESTCLUSTERNAME1="sol-gke-ghatest-$(date +%s)"
+        echo "TESTCLUSTERNAME1=$TESTCLUSTERNAME1" >> $GITHUB_ENV
+        scripts/create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f -c $TESTCLUSTERNAME1 -m g1-small
+        kubectl get statefulset,svc,pods,pvc,pv
+        echo "Testing cluster create script with perf tuning"
+        TESTCLUSTERNAME2="sol-gke-ghatest-$(date +%s)"
+        echo "TESTCLUSTERNAME2=$TESTCLUSTERNAME2" >> $GITHUB_ENV
+        scripts/create_cluster.sh -z us-central1-b,us-central1-c,us-central1-f -c $TESTCLUSTERNAME2 -m g1-small -i cos -p
+        gcloud compute instances list --format='table(name,zone,status,tags.items)' | grep "'$TESTCLUSTERNAME2'"
+        command="sudo ls /etc/sysctl.d"
+        list=`gcloud compute instances list --format='table(name,zone,status,tags.items)' | grep "'$TESTCLUSTERNAME2'"`
+        # Check if occurrences of 99-sysctl.conf and 98-solace-sysctl.conf equal
+        a=`while read -r a b c ; do (gcloud compute ssh --ssh-flag="-T -o StrictHostKeyChecking=no" --zone $b $a -- "$command" &) ; done <<< "$list" ; sleep 2 ; wait` ; echo $a
+        bash -c "if [[ `echo \"$a\" | grep -o 99-sysctl | wc -l` != `echo \"$a\" | grep -o 98-solace | wc -l` ]] ; then echo \"Occurrences of 99-sysctl.conf and 98-solace-sysctl.conf not equal\" ; exit 1 ; fi"
+
+    - name: Delete test resources (Cleanup)
+      if: ${{ always() }}
+      run: |
+        gcloud container images delete $STANDARD_IMAGE_URL --quiet
+        gcloud container images delete $EVAL_IMAGE_URL --quiet
+        gcloud container clusters delete $TESTCLUSTERNAME1 --quiet --zone us-central1-b
+        gcloud container clusters delete $TESTCLUSTERNAME2 --quiet --zone us-central1-b
+        gcloud compute disks list | grep gha | sed 1d $rpt | while read -r a b c; do gcloud compute disks delete $a --zone $b --quiet || echo "Skipping disk $a that is in use"; done
