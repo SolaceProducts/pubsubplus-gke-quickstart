@@ -76,4 +76,4 @@ jobs:
         gcloud container images delete $EVAL_IMAGE_URL --quiet
         gcloud container clusters delete $TESTCLUSTERNAME1 --quiet --zone us-central1-b
         gcloud container clusters delete $TESTCLUSTERNAME2 --quiet --zone us-central1-b
-        gcloud compute disks list | grep gha | sed 1d $rpt | while read -r a b c; do gcloud compute disks delete $a --zone $b --quiet; done
+        gcloud compute disks list | grep gha | sed 1d $rpt | while read -r a b c; do gcloud compute disks delete $a --zone $b --quiet || echo "Skipping disk $a that is in use"; done
