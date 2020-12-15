@@ -38,6 +38,7 @@ jobs:
 
     - name: Testing solace image to GCR
       run: |
+        gcloud auth configure-docker --quiet
         cd scripts
         chmod +x copy_docker_image_to_gcr.sh
         PUBSUBPLUS_IMAGE_URL=${{ secrets.BROKER_DOCKER_IMAGE_REF }} ./copy_docker_image_to_gcr.sh | tee results
