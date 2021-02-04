@@ -1,33 +1,28 @@
-name: build
+name: daily-sanity-master
 
-# Controls when the action will run. 
 on:
-  pull_request:
-
   push:
 
-# on:
-#   push:
-
-#   schedule:
-#   - cron: "0/10 * * * *"
+  schedule:
+  - cron: "0 5 * * *"
 
 jobs:
-  deploy:
-    name: GKE CI test
+  build:
+
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
-    - name: Set env and tools
+    - uses: actions/checkout@v2
+      with:
+        ref: master
+
+    - name: Set env
       run: |
         echo "TESTRUNBRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
         #
         sudo snap install kubectl --classic
         kubectl version --client
-
-    - name: Checkout
-      uses: actions/checkout@v2
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@master
