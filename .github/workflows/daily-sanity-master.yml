@@ -60,9 +60,9 @@ jobs:
         gcloud compute instances list --format='table(name,zone,status,tags.items)' | grep "'$TESTCLUSTERNAME2'"
         command="sudo ls /etc/sysctl.d"
         list=`gcloud compute instances list --format='table(name,zone,status,tags.items)' | grep "'$TESTCLUSTERNAME2'"`
-        # Check if occurrences of 99-sysctl.conf and 98-solace-sysctl.conf equal
+        # Check if occurrences of 99-gke-defaults.conf and 98-solace-sysctl.conf equal
         a=`while read -r a b c ; do (gcloud compute ssh --ssh-flag="-T -o StrictHostKeyChecking=no" --zone $b $a -- "$command" &) ; done <<< "$list" ; sleep 2 ; wait` ; echo $a
-        bash -c "if [[ `echo \"$a\" | grep -o 99-sysctl | wc -l` != `echo \"$a\" | grep -o 98-solace | wc -l` ]] ; then echo \"Occurrences of 99-sysctl.conf and 98-solace-sysctl.conf not equal\" ; exit 1 ; fi"
+        bash -c "if [[ `echo \"$a\" | grep -o 99-gke-defaults | wc -l` != `echo \"$a\" | grep -o 98-solace | wc -l` ]] ; then echo \"Occurrences of 99-gke-defaults.conf and 98-solace-sysctl.conf not equal\" ; exit 1 ; fi"
 
     - name: Delete test resources (Cleanup)
       if: ${{ always() }}
