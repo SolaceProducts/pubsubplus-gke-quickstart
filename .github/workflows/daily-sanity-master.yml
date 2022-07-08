@@ -35,6 +35,7 @@ jobs:
       run: |
         gcloud auth configure-docker --quiet
         chmod +x scripts/copy_docker_image_to_gcr.sh
+        echo ${{ secrets.BROKER_DOCKER_IMAGE_REF }}
         PUBSUBPLUS_IMAGE_URL=${{ secrets.BROKER_DOCKER_IMAGE_REF }} scripts/copy_docker_image_to_gcr.sh | tee results
         STANDARD_IMAGE_URL="$(cat results | awk -F location: '{printf $2}')";
         echo "STANDARD_IMAGE_URL=$STANDARD_IMAGE_URL" >> $GITHUB_ENV
