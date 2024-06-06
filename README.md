@@ -134,7 +134,7 @@ You can also view the new entry on the Google Container Registry in the Cloud Pl
 
 <br>
 
-For general additional information, refer to the [Using private registries]([https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/master/docs/PubSubPlusK8SDeployment.md#using-private-registries](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/main/docs/EventBrokerOperatorUserGuide.md#using-a-private-registry) section in the PubSub+ Kubernetes Documentation.
+For general additional information, refer to the [Using private registries](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/main/docs/EventBrokerOperatorUserGuide.md#using-a-private-registry) section in the PubSub+ Kubernetes Documentation.
 
 ### Step 3: Deploy the event broker
 
