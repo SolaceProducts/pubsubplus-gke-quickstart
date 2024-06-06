@@ -16,9 +16,9 @@ The [Solace PubSub+ Platform](https://solace.com/products/platform/)'s [software
 
 Solace PubSub+ Software Event Broker can be deployed in either a three-node High-Availability (HA) group, or as a single-node standalone deployment. For simple test environments that need only to validate application functionality, a single instance will suffice. Note that in production, or any environment where message loss cannot be tolerated, an HA deployment is required.
 
-Detailed documentation of deploying PubSub+ in a general Kubernetes environment is provided in the [Solace PubSub+ Software Event Broker in Kubernetes Documentation](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/master/docs/PubSubPlusK8SDeployment.md).
+Detailed documentation of deploying PubSub+ in a general Kubernetes environment is provided in the [Solace PubSub+ Software Event Broker in Kubernetes Documentation](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/main/docs/EventBrokerOperatorUserGuide.md#supported-kubernetes-environments).
 
-Consult the [Deployment Considerations](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/master/docs/PubSubPlusK8SDeployment.md#pubsub-software-event-broker-deployment-considerations) when planning your deployment, then follow these steps to deploy.
+Consult the [Deployment Considerations](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/main/docs/EventBrokerOperatorUserGuide.md) when planning your deployment, then follow these steps to deploy.
 
 The following diagram illustrates an HA deployment on a three node GKE cluster spread across three zones.
 
@@ -134,7 +134,7 @@ You can also view the new entry on the Google Container Registry in the Cloud Pl
 
 <br>
 
-For general additional information, refer to the [Using private registries](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/master/docs/PubSubPlusK8SDeployment.md#using-private-registries) section in the PubSub+ Kubernetes Documentation.
+For general additional information, refer to the [Using private registries](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/main/docs/EventBrokerOperatorUserGuide.md#using-a-private-registry) section in the PubSub+ Kubernetes Documentation.
 
 ### Step 3: Deploy the event broker
 
