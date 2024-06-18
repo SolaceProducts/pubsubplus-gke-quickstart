@@ -4,7 +4,7 @@
 
 ## Purpose of this repository
 
-This repository extends the [PubSub+ Software Event Broker on Kubernetes Quickstart](//github.com/SolaceProducts/pubsubplus-kubernetes-quickstart ) to show you how to install Solace PubSub+ Software Event Broker onto Google Kubernetes Engine (GKE).
+This repository extends the [PubSub+ Software Event Broker on Kubernetes Quickstart](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart ) to show you how to install Solace PubSub+ Software Event Broker onto Google Kubernetes Engine (GKE).
 
 The recommended software event broker version is 9.4 or later.
 
@@ -16,9 +16,9 @@ The [Solace PubSub+ Platform](https://solace.com/products/platform/)'s [software
 
 Solace PubSub+ Software Event Broker can be deployed in either a three-node High-Availability (HA) group, or as a single-node standalone deployment. For simple test environments that need only to validate application functionality, a single instance will suffice. Note that in production, or any environment where message loss cannot be tolerated, an HA deployment is required.
 
-Detailed documentation of deploying PubSub+ in a general Kubernetes environment is provided in the [Solace PubSub+ Software Event Broker in Kubernetes Documentation](//github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/master/docs/PubSubPlusK8SDeployment.md).
+Detailed documentation of deploying PubSub+ in a general Kubernetes environment is provided in the [Solace PubSub+ Software Event Broker in Kubernetes Documentation](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/main/docs/EventBrokerOperatorUserGuide.md#supported-kubernetes-environments).
 
-Consult the [Deployment Considerations](//github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/master/docs/PubSubPlusK8SDeployment.md#pubsub-software-event-broker-deployment-considerations) when planning your deployment, then follow these steps to deploy.
+Consult the [Deployment Considerations](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/main/docs/EventBrokerOperatorUserGuide.md) when planning your deployment, then follow these steps to deploy.
 
 The following diagram illustrates an HA deployment on a three node GKE cluster spread across three zones.
 
@@ -35,9 +35,9 @@ Perform any prerequisites to access GKE from your command-line environment.  For
 
 Tasks may include:
 
-* Get access to the Google Cloud Platform, [select or create a new project](//console.cloud.google.com/projectselector2/kubernetes) and enable billing.
-* Install the Kubernetes [`kubectl`](//kubernetes.io/docs/tasks/tools/install-kubectl/ ) tool.
-* Install the [`gcloud`](//cloud.google.com/sdk/gcloud/) command-line tool and initialize it running `gcloud init`.
+* Get access to the Google Cloud Platform, [select or create a new project](https://console.cloud.google.com/projectselector2/kubernetes) and enable billing.
+* Install the Kubernetes [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/ ) tool.
+* Install the [`gcloud`](https://cloud.google.com/sdk/gcloud/) command-line tool and initialize it running `gcloud init`.
 * Create a GKE cluster (see below) or use an existing one.
 * Fetch the credentials of the GKE cluster.
 
@@ -59,7 +59,7 @@ Script options and arguments:
 * For a multi-node GKE-cluster in a single GCP zone, specify `-n = 3` as the number of nodes per zone and a single `-z <zone>`. 
 * If you want the HA cluster spread across three zones within a region - which is the configuration recommended for production situations - specify the three zones as per the example below, but leave the number of nodes per zone at the default value of 1.
 * The default cluster name is `solace-cluster` which can be changed by specifying the `-c <cluster name>` command line argument.
-* The default machine type is "n1-standard-4". To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine-type>`. Ensure to meet the [CPU and memory requirements](//github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/master/docs/PubSubPlusK8SDeployment.md#cpu-and-memory-requirements).
+* The default machine type is "n1-standard-4". To use a different [Google machine type](https://cloud.google.com/compute/docs/machine-types ), specify `-m <machine-type>`. Ensure to meet the [CPU and memory requirements](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/master/docs/PubSubPlusK8SDeployment.md#cpu-and-memory-requirements).
 * The default node OS image type is Ubuntu. Specify [other node image type](https://cloud.google.com/kubernetes-engine/docs/concepts/node-images ) using `-i <image-type>`
 
 > **Important:** if connecting Solace brokers across GCP regions, there is a known issue affecting TCP throughput with the default node OS image type Ubuntu and default settings. In this case additionally specify the node image as Container-Optimized OS (cos) and a flag to apply performance tuning: `-i cos -p`. 
@@ -88,17 +88,9 @@ If this fails, you will need to [troubleshoot GKE](https://cloud.google.com/kube
 
 <br>
 
-### Step 2: Deploy Helm package manager
+### Step 2 (Optional): Load the PubSub+ EBS Docker image to private Docker image registry
 
-We recommend using the [Kubernetes Helm](//github.com/kubernetes/helm/blob/master/README.md ) tool to manage the deployment.
-
-Refer to the [Install and configure Helm](//github.com/SolaceProducts/pubsubplus-kubernetes-quickstart#2-install-and-configure-helm) section of the PubSub+ Kubernetes Quickstart.
-
-<br>
-
-### Step 3 (Optional): Load the PubSub+ EBS Docker image to private Docker image registry
-
-**Hint:** You may skip the rest of this step if not using Google Container Registry (GCR) or other private Docker registry. The free PubSub+ Software Event Broker Standard Edition is available from the [public Docker Hub registry](//hub.docker.com/r/solace/solace-pubsub-standard/tags/ ), the image reference is `solace/solace-pubsub-standard:<TagName>`.
+**Hint:** You may skip the rest of this step if not using Google Container Registry (GCR) or other private Docker registry. The free PubSub+ Software Event Broker Standard Edition is available from the [public Docker Hub registry](https://hub.docker.com/r/solace/solace-pubsub-standard/tags/ ), the image reference is `solace/solace-pubsub-standard:<TagName>`.
 
 To get the event broker Docker image URL, go to the Solace Developer Portal and download the Solace PubSub+ Software Event Broker as a **docker** image or obtain your version from Solace Support.
 
@@ -112,13 +104,13 @@ To get the event broker Docker image URL, go to the Solace Developer Portal and 
 If using GCR for private Docker registry, use the `copy_docker_image_to_gcr.sh` script from this repo.
 
 Prerequisites:
-* Local installation of [Docker](//docs.docker.com/get-started/ ) is required
+* Local installation of [Docker](https://docs.docker.com/get-started/ ) is required
 * Ensure `gcloud init` is complete.
 
 Script options and arguments:
 * PUBSUBPLUS_IMAGE_URL: the PubSub+ docker image location, can be one of the followings:
   * name of a Docker image from a publicly available Docker image registry (default is `solace/solace-pubsub-standard:latest`)
-  * a Solace Docker image download URL obtained from the [Solace Downloads site](//solace.com/downloads/)
+  * a Solace Docker image download URL obtained from the [Solace Downloads site](https://solace.com/downloads/)
   * a web server download URL - the corresponding `md5` file must be collocated with the Solace Docker image
   * path to a Solace Docker image tar.gz file in the local file system
 * GCR_HOST: fully qualified hostname of the GCR server - default is `gcr.io`
@@ -142,17 +134,11 @@ You can also view the new entry on the Google Container Registry in the Cloud Pl
 
 <br>
 
-For general additional information, refer to the [Using private registries](//github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/master/docs/PubSubPlusK8SDeployment.md#using-private-registries) section in the PubSub+ Kubernetes Documentation.
+For general additional information, refer to the [Using private registries](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/main/docs/EventBrokerOperatorUserGuide.md#using-a-private-registry) section in the PubSub+ Kubernetes Documentation.
 
-### Step 4: Deploy the event broker
+### Step 3: Deploy the event broker
 
-From here follow the steps in [the PubSub+ Software Event Broker in Kubernetes Quickstart](//github.com/SolaceProducts/pubsubplus-kubernetes-quickstart#3-install-the-solace-pubsub-software-event-broker-with-default-configuration) to deploy a single-node or an HA event broker.
-
-Refer to the detailed PubSub+ Kubernetes documentation for:
-* [Validating the deployment](//github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/master/docs/PubSubPlusK8SDeployment.md#validating-the-deployment); or
-* [Troubleshooting](//github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/master/docs/PubSubPlusK8SDeployment.md#troubleshooting)
-* [Modifying or Upgrading](//github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/master/docs/PubSubPlusK8SDeployment.md#modifying-or-upgrading-a-deployment)
-* [Deleting the deployment](//github.com/SolaceProducts/pubsubplus-kubernetes-quickstart/blob/master/docs/PubSubPlusK8SDeployment.md#deleting-a-deployment)
+From here follow the steps in [the PubSub+ Software Event Broker in Kubernetes Quickstart](https://github.com/SolaceProducts/pubsubplus-kubernetes-quickstart) to deploy a single-node or an HA event broker.
 
 ## Contributing
 
@@ -160,7 +146,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ## Authors
 
-See the list of [contributors](//github.com/SolaceProducts/pubsubplus-gke-quickstart/graphs/contributors ) who participated in this project.
+See the list of [contributors](https://github.com/SolaceProducts/pubsubplus-gke-quickstart/graphs/contributors ) who participated in this project.
 
 ## License
 
@@ -170,6 +156,6 @@ This project is licensed under the Apache License, Version 2.0. - See the [LICEN
 
 For more information about Solace technology in general please visit these resources:
 
-- The Solace Developer Portal website at: [solace.dev](//solace.dev/)
-- Understanding [Solace technology](//solace.com/products/platform/)
-- Ask the [Solace community](//dev.solace.com/community/).
+- The Solace Developer Portal website at: [solace.dev](https://solace.dev/)
+- Understanding [Solace technology](https://solace.com/products/platform/)
+- Ask the [Solace community](https://dev.solace.com/community/).
